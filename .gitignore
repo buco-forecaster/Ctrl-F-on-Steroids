@@ -1,0 +1,8 @@
+.clinerules
+.clineignore
+.DS_Store
+.auth
+.idea
+memory-bank
+outputs
+*.pyc
