@@ -1,0 +1,76 @@
+---DEFAULT-FOLLOWUP---
+Return exactly one fenced code block (copy paste block). Show only the requested summary table inside the block. No text before or after. No extra blocks. No explanations or comments.
+Do not include backticks inside the block. Output only this code block so I can parse and store it as a string in Python.
+
+---QUERY_SEPARATOR---
+VARIABLES:
+- LEAGUE: Premier League
+- MATCH_DATE: 01 November 2025
+- INCLUSION: Only matches confirmed to be played on MATCH DATE.
+
+TITLE: DeepSearch Quantitative Value Bet Identification Protocol
+
+ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializing in football betting markets. Utilize advanced statistical modeling, multi-source data synthesis, and rigorous DeepSearch verification to identify statistically significant Value Bets with positive Expected Value (+EV).
+
+CORE CONSTRAINTS:
+- ODDS SOURCE: Primary: Fortuna SK (fortuna.sk). If unavailable, use a reputable Slovak fallback (e.g., Niké, Tipsport SK) and label it as Fallback: [Name].
+- ODDS RANGE: Decimal odds strictly between 1.30 and 7.00.
+- ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5).
+- FORBIDDEN MARKETS: Both Teams To Score (BTTS), Corners, Cards, Asian Handicaps.
+- CITATION MANDATE: All critical data points (stats, odds, key news) MUST be cited with a direct URL.
+
+EXECUTION PROTOCOL:
+PHASE 1: MARKET INTAKE AND DATA ACQUISITION
+1) Identify all matches within the SCOPE. List kickoff times in UTC.
+2) Market Data: Retrieve current odds from the ODDS SOURCE for all ALLOWED MARKETS.
+   - Crucial: Record the exact UTC timestamp of odds retrieval.
+   - Calculate the Bookmaker Margin (Vigorish) for each market. (Margin = (1/Odds1 + 1/Odds2 + ... + 1/OddsN) - 1). Prioritize analysis on markets with the lowest margin.
+3) Advanced Metrics (Season-to-date & Last 8 matches): Acquire and verify data from Fbref (Primary) and Flashscore (Secondary):
+   - Non-Penalty Expected Goals (npxG) and Non-Penalty Expected Goals Allowed (npxGA).
+   - Set-Piece xG and xGA.
+   - Shot-Creating Actions (SCA) or Progressive Carries/Passes (as proxies for offensive threat).
+   - Shooting Efficiency (Goals minus xG).
+4) Baseline Strength: Acquire current Elo ratings and recent trends (last 30 days) from clubelo.com.
+5) Situational Data: Acquire injury/suspension data (Flashscore, official club announcements or similar pages), schedule context (days of rest), and tactical styles (WhoScored).
+
+PHASE 2: FEATURE ENGINEERING AND SIGNAL GENERATION
+1) Form Analysis: Calculate weighted form metrics, emphasizing home/away splits using SoccerSTATS and Fbref.
+2) xG Differentials: Calculate rolling npxG differentials (npxG - npxGA) over the last 8 matches. Identify teams significantly over- or under-performing their underlying metrics (candidates for regression).
+3) Qualitative Impact Quantification:
+   - Quantify the impact of key injuries/suspensions on team npxG and npxGA based on player contribution data (Fbref). (e.g., "Absence of Player X reduces team npxG expectancy by 0.2 based on their season contribution").
+4) H2H Context: Analyze the last 3 H2H meetings (Fbref match logs), focusing on tactical setups and xG flow, rather than just results.
+
+PHASE 3: PROBABILITY MODELING AND CALIBRATION
+1) Model Implementation: Utilize an Ensemble Model blending:
+   - A customized Poisson or Negative Binomial distribution based on adjusted Attack/Defense strengths (derived from npxG/npxGA, recent form, and qualitative adjustments from Phase 2).
+   - An Elo-based probability calculation.
+2) Calibration: Calibrate the model outputs against the current LEAGUE season's averages (e.g., average goals per game, home-field advantage coefficient, draw frequency).
+3) Model Probability: Generate the 'Model Probability' (True Probability) for all outcomes in the 1X2 and relevant O/U markets.
+
+PHASE 4: VALUE IDENTIFICATION AND PRIORITIZATION
+1) Fair Implied Probability: Calculate the bookmaker's implied probability (1/Odds). Remove the margin calculated in Phase 1 to determine the 'Fair Implied Probability' (probabilities rescaled to sum to 100%).
+2) Edge Calculation: Edge = Model Probability - Fair Implied Probability.
+3) ROI Calculation: ROI (Expected Return on Investment) = (Model Probability * Decimal Odds) - 1.
+4) Selection: Filter for bets where Edge > 0 and all CORE CONSTRAINTS are met.
+5) Confidence Scoring (0-10): Assign a score based on:
+   - Data robustness (Quality of xG/Elo data, sample size). (4 points)
+   - Model certainty and agreement between ensemble components. (3 points)
+   - Certainty regarding situational factors (injuries/lineups confirmed). (3 points)
+6) Prioritization: Sort final selections by Confidence (descending), then ROI (descending). When ROI is similar, prioritize higher Model Probability and lower Margin.
+
+PHASE 5: OUTPUT GENERATION
+1) External Cross-Check: Compare the generated Value Bets against analysis from reputable analytical sources (Betarena, Covers). Note significant disagreements in the Evidence column.
+2) Output: Generate the final table.
+
+**OUTPUT FORMAT:**
+Return Markdown table.
+
+| League | Match | Kickoff UTC | Market | Selection | Bookmaker | Decimal Odds | Fair Implied Probability (%) | Model Probability (%) | Edge (%) | ROI (%) | Margin (%) | Confidence (0-10) | Sources | Evidence |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| [Text] | [Text] | [HH:MM] | [1X2 or O/U X.5] | [Pick] | [Source Name] | [X.XX] | [XX.X%] | [XX.X%] | [X.X%] | [X.X%] | [X.X%] | [0-10] | [Links] | [Text] |
+
+COLUMN RULES:
+- Percentages (Fair Implied, Model, Edge, ROI, Margin) must be rounded to one decimal place (e.g., 5.1%).
+- Decimal Odds must have exactly two decimal places (e.g., 2.00).
+- Sources: Must contain short, numbered inline links (e.g., [1](url) [2](url)) referencing direct URLs used for critical data.
+- Evidence: A concise, data-driven justification (max 200 characters) referencing key signals and including the odds retrieval timestamp. Example: "HOME npxG differential +0.5 over L8 [1]; AWAY key defender (Player X) injured [2]; Model favors Over. Odds retrieved 01 Nov 23:30 UTC."

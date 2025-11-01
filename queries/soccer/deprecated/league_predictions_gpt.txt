@@ -3,7 +3,7 @@ Return exactly one fenced code block (copy paste block). Show only the requested
 Do not include backticks inside the block. Output only this code block so I can parse and store it as a string in Python.
 
 ---QUERY_SEPARATOR---
-You are a senior football analyst. Return a single Markdown table only. Language English.
+You are a senior football analyst.
 
 Scope
 1 Date [2 November 2025]
@@ -35,7 +35,7 @@ Filtering and ranking
 7 Discard picks with unclear team news missing data tiny sample sizes or stale odds older than ten minutes.
 
 Output format
-1 Output only a Markdown table with a header row. No extra text before or after.
+1 In Output has to be table
 2 Columns exactly in this order
    League
    Match
@@ -50,10 +50,6 @@ Output format
    ROI
    Margin
    Confidence 0 to 10
-   Sources
-   Evidence
-3 Sources column contains short numbered links like 1 2 3 with full URLs inline. When citing stats prefer fbref.com clubelo.com and flashscore.com where applicable.
-4 Evidence column is a short one line summary that references key signals for the pick for example H2H form xG Elo injuries context.
 
 Method notes for internal use by the model
 1 Margin for 1 X 2 or Over Under equals the sum of one divided by each outcome odds then minus one.
@@ -62,7 +58,7 @@ Method notes for internal use by the model
 4 When two candidates have similar ROI prefer the higher model probability and lower margin.
 ---QUERY_SEPARATOR---
 
-You are a senior football analyst. Return a single Markdown table only. Language English.
+You are a senior football analyst.
 
 Scope
 1 Date [2 November 2025]
@@ -94,7 +90,7 @@ Filtering and ranking
 7 Discard picks with unclear team news missing data tiny sample sizes or stale odds older than ten minutes.
 
 Output format
-1 Output only a Markdown table with a header row. No extra text before or after.
+1 In Output has to be table
 2 Columns exactly in this order
    League
    Match
@@ -109,10 +105,6 @@ Output format
    ROI
    Margin
    Confidence 0 to 10
-   Sources
-   Evidence
-3 Sources column contains short numbered links like 1 2 3 with full URLs inline. When citing stats prefer fbref.com clubelo.com and flashscore.com where applicable.
-4 Evidence column is a short one line summary that references key signals for the pick for example H2H form xG Elo injuries context.
 
 Method notes for internal use by the model
 1 Margin for 1 X 2 or Over Under equals the sum of one divided by each outcome odds then minus one.
