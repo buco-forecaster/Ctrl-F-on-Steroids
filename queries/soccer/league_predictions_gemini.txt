@@ -1,3 +1,7 @@
+---DEFAULT-FOLLOWUP---
+Return exactly one fenced code block (copy paste block). Show only the requested summary table inside the block. No text before or after. No extra blocks. No explanations or comments.
+Do not include backticks inside the block. Output only this code block so I can parse and store it as a string in Python.
+
 ---QUERY_SEPARATOR---
 SCOPE
 1 League [Premier League] (hereafter referred to as "LEAGUE")
@@ -11,9 +15,10 @@ GOAL
 Identify the best betting opportunities in the LEAGUE on DATE. Maximize expected ROI and winning probability.
 
 PRIMARY DATA SOURCES
-1 League table team and player stats and historical H2H from fbref.com
+1 League table team and player stats and historical H2H from fbref.com, SoccerSTATS, WhoScored
 2 Team Elo ratings from clubelo.com
 3 Expected Goals xG and Expected Goals Conceded xGc from fbref.com and flashscore.com
+4 Tips and written analysis from Flashscore, SoccerSTATS, WhoScored, Betarena, Covers, and similar.
 
 CORE CONSTRAINTS
 1 Odds source Fortuna SK at fortuna.sk. If odds are unavailable use a Slovak fallback bookmaker and state this as Fallback.
@@ -41,7 +46,7 @@ C Situational and news
 1 Injuries suspensions lineup news from the latest reports and pre match pressers.
 2 Context motivation schedule congestion rest days travel weather.
 D External sources
-1 Collect and compare analysis and tips from reputable sites such as Action Network Covers Betarena Flashscore analytics and similar.
+1 Collect and compare analysis and tips from reputable sites such as Betarena, Covers, Flashscore analytics and similar.
 2 Record links and timestamps. Note the stance for or against or neutral and brief rationale quality.
 
 PHASE 3 PROBABILITY MODELING AND VALUE

@@ -1,3 +1,7 @@
+---DEFAULT-FOLLOWUP---
+Return exactly one fenced code block (copy paste block). Show only the requested summary table inside the block. No text before or after. No extra blocks. No explanations or comments.
+Do not include backticks inside the block. Output only this code block so I can parse and store it as a string in Python.
+
 ---QUERY_SEPARATOR---
 You are a senior football analyst. Return a single Markdown table only. Language English.
 
@@ -8,9 +12,9 @@ Scope
 
 Data tasks
 1 List all matches in scope with kickoff in UTC.
-2 Gather tips and written analysis from reputable sites such as Flashscore Betarena Covers Action Network and similar. Keep direct links and timestamps.
+2 Gather tips and written analysis from reputable sites such as Flashscore, SoccerSTATS, WhoScored, Betarena, Covers, and similar. Keep direct links and timestamps.
 3 Build your own model based analysis using these signals with preferred data sources
-   a Table position team and player stats and historical H2H from fbref.com
+   a Table position team and player stats and historical H2H from fbref.com, SoccerSTATS, WhoScored
    b Team Elo ratings from clubelo.com
    c Expected goals xG and expected goals conceded xGc from fbref.com and flashscore.com
    d Injuries suspensions lineup news
@@ -67,9 +71,9 @@ Scope
 
 Data tasks
 1 List all matches in scope with kickoff in UTC.
-2 Gather tips and written analysis from reputable sites such as Flashscore Betarena Covers Action Network and similar. Keep direct links and timestamps.
+2 Gather tips and written analysis from reputable sites such as Flashscore, SoccerSTATS, WhoScored, Betarena, Covers, and similar. Keep direct links and timestamps.
 3 Build your own model based analysis using these signals with preferred data sources
-   a Table position team and player stats and historical H2H from fbref.com
+   a Table position team and player stats and historical H2H from fbref.com, SoccerSTATS, WhoScored
    b Team Elo ratings from clubelo.com
    c Expected goals xG and expected goals conceded xGc from fbref.com and flashscore.com
    d Injuries suspensions lineup news
@@ -88,4 +92,31 @@ Filtering and ranking
 5 Compute expected value ROI as model probability times decimal odds minus one.
 6 Rank all rows by Confidence then ROI both in descending order. Break ties by higher model probability and lower margin.
 7 Discard picks with unclear team news missing data tiny sample sizes or stale odds older than ten minutes.
+
+Output format
+1 Output only a Markdown table with a header row. No extra text before or after.
+2 Columns exactly in this order
+   League
+   Match
+   Kickoff UTC
+   Market
+   Selection
+   Bookmaker
+   Decimal odds
+   Fair implied probability
+   Model probability
+   Edge
+   ROI
+   Margin
+   Confidence 0 to 10
+   Sources
+   Evidence
+3 Sources column contains short numbered links like 1 2 3 with full URLs inline. When citing stats prefer fbref.com clubelo.com and flashscore.com where applicable.
+4 Evidence column is a short one line summary that references key signals for the pick for example H2H form xG Elo injuries context.
+
+Method notes for internal use by the model
+1 Margin for 1 X 2 or Over Under equals the sum of one divided by each outcome odds then minus one.
+2 Implied probability equals one divided by odds. Fair implied probability is the implied probability rescaled so that the sum across outcomes equals one after removing margin.
+3 ROI equals model probability times decimal odds minus one.
+4 When two candidates have similar ROI prefer the higher model probability and lower margin.
 ---QUERY_SEPARATOR---

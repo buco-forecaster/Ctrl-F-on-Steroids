@@ -73,6 +73,8 @@ class GeminiClient:
         self.page.keyboard.press("Enter")
         self.wait_for_answer(L.RE_FOLLOWUP_WAIT, state="visible")
         self.wait_for_answer(L.RE_FOLLOWUP_WAIT, state="hidden")
+        time.sleep(5)
+
         return self.extract_last_assistant_answer()
 
     def export_pdf(self, query: Optional[str] = None) -> str:
