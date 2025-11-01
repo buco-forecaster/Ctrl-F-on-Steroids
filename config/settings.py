@@ -1,7 +1,9 @@
 from pathlib import Path
+from unittest.mock import DEFAULT
 
 # Core configuration
 GEMINI_URL = "https://gemini.google.com/app"
+GOOGLE_ACCOUNTS_URL = "https://accounts.google.com/"
 AUTH_STATE_PATH = Path(".auth/storage_state_chrome.json")
 CHROME_PROFILE_DIR = Path.home() / "chrome-automation-profile"
 
@@ -14,8 +16,9 @@ USER_AGENT = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
               "Chrome/124.0.0.0 Safari/537.36")
 
 # Timeouts (ms)
-DEFAULT_QUERY_TIMEOUT_MS = 60_000
-DEFAULT_RESEARCH_TIMEOUT_MS = 10 * 60_000
+DEFAULT_TIMEOUT_MS = 60_000
+DEFAULT_START_RESEARCH_TIMEOUT_MS = 120_000
+DEFAULT_DEEP_RESEARCH_TIMEOUT_MS = 10 * 60_000
 
 # Output paths
 OUTPUTS_DIR = Path("outputs")

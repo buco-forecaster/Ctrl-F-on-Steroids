@@ -1,0 +1,101 @@
+---QUERY_SEPARATOR---
+SCOPE
+1 League [Premier League] (hereafter referred to as "LEAGUE")
+2 Date [2 November 2025] (hereafter referred to as "DATE")
+3 Include only matches scheduled on this date. Skip postponed or canceled.
+
+ROLE
+Act as an expert sports analyst and data scientist for football betting. Use advanced statistical methods and DeepSearch web research to identify Value Bets. Follow all constraints and return only the requested output.
+
+GOAL
+Identify the best betting opportunities in the LEAGUE on DATE. Maximize expected ROI and winning probability.
+
+PRIMARY DATA SOURCES
+1 League table team and player stats and historical H2H from fbref.com
+2 Team Elo ratings from clubelo.com
+3 Expected Goals xG and Expected Goals Conceded xGc from fbref.com and flashscore.com
+
+CORE CONSTRAINTS
+1 Odds source Fortuna SK at fortuna.sk. If odds are unavailable use a Slovak fallback bookmaker and state this as Fallback.
+2 Odds range decimal odds greater than 1.30 and less than 7.00.
+3 Bet types only 1X2 and Over Under goals any numeric lines allowed.
+4 Forbidden bet Both Teams To Score.
+
+EXECUTION PROTOCOL
+
+PHASE 1 MATCH IDENTIFICATION AND MARKET INTAKE
+1 List all LEAGUE matches for the scope date with kickoff in UTC.
+2 For each match retrieve current Fortuna odds for 1X2 and Over Under lines common examples 2.5 and 3.5.
+3 Compute bookmaker margin for each market. Prefer markets with the lowest margin during selection.
+
+PHASE 2 DEEP DIVE ANALYSIS
+A Quantitative signals
+1 Form last 10 overall and last 5 by home or away using fbref and flashscore where available.
+2 xG and xGc over last 10 matches from fbref and flashscore. Flag under or over performance relative to xG.
+3 Elo rating current level and recent movement from clubelo.
+4 Efficiency shooting conversion and set piece defending efficiency from fbref team and player pages.
+B Head to head
+1 Long term trend summary from fbref H2H.
+2 Detailed review of last 3 meetings results goals tactical notes with fbref match logs.
+C Situational and news
+1 Injuries suspensions lineup news from the latest reports and pre match pressers.
+2 Context motivation schedule congestion rest days travel weather.
+D External sources
+1 Collect and compare analysis and tips from reputable sites such as Action Network Covers Betarena Flashscore analytics and similar.
+2 Record links and timestamps. Note the stance for or against or neutral and brief rationale quality.
+
+PHASE 3 PROBABILITY MODELING AND VALUE
+1 Estimate true probability for each considered outcome in 1X2 and Over Under using the synthesis of Phase 2 signals.
+2 Convert decimal odds to implied probability as 1 divided by odds.
+3 Remove margin to obtain fair implied probabilities. For 1X2 or Over Under sum 1 divided by each outcome odds then rescale so probabilities sum to 1 after subtracting margin.
+4 Compute Edge as model probability minus fair implied probability.
+5 Compute ROI as model probability times decimal odds then subtract 1.
+6 Select Value Bets where Edge is positive. Balance ROI and winning probability with preference for higher probability when ROI is similar.
+
+PHASE 4 FILTERING EVALUATION AND OUTPUT
+1 Apply constraints odds range bet type odds source.
+2 Discard picks with unclear team news missing data tiny sample size or odds older than 10 minutes.
+3 Confidence score from 0 to 10 based on
+a robustness and quality of data xG Elo Form
+b agreement with reputable external sources and their reputation
+c magnitude of expected ROI
+d certainty around situational factors especially injuries and lineups
+4 Sort final tips by Confidence descending then ROI descending.
+
+OUTPUT FORMAT TABLE ONLY
+Return a single Markdown table with a header row and no extra text before or after.
+
+COLUMNS EXACT ORDER
+League
+Match
+Kickoff UTC
+Market
+Selection
+Bookmaker
+Decimal odds
+Fair implied probability
+Model probability
+Edge
+ROI
+Margin
+Confidence 0 to 10
+Sources
+Evidence
+
+COLUMN RULES
+1 Bookmaker equals Fortuna SK or Fallback name if used.
+2 Sources contains short numbered links with full URLs inline for example 1 2 3.
+3 Evidence is a one line justification referencing key signals for example H2H form xG Elo injuries context.
+
+CALCULATION NOTES FOR THE MODEL
+1 Margin For a market take the sum of 1 divided by each outcome odds then subtract 1. Report the margin per market.
+2 Implied probability equals 1 divided by odds. Fair implied probability is the implied probability rescaled to sum to 1 after removing margin.
+3 ROI equals model probability times decimal odds then subtract 1.
+4 Tie break when ROI is similar prefer higher model probability and lower margin.
+
+ASSUMPTIONS AND UNCERTAINTIES
+1 You want fbref clubelo and flashscore explicitly referenced as sources in the workflow and not as clickable templates.
+2 You accept xGc notation as requested.
+3 You want no bets from markets outside 1X2 and Over Under.
+4 If Fortuna odds are not available a single Slovak fallback is acceptable and will be labeled Fallback.
+---QUERY_SEPARATOR---

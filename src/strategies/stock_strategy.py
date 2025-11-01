@@ -4,9 +4,10 @@ from src.data.models import QueryRequest, AnalysisResult
 
 class StockStrategy:
     def run(self, client: GeminiClient, request: QueryRequest) -> AnalysisResult:
-        client.page.goto("https://gemini.google.com/app")
         pdf_path = client.execute_deep_research(request.query)
         followups = client.ask_followups(request.followups)
+        client.new_chat()
+
         return AnalysisResult(
             timestamp=datetime.now().isoformat(timespec="seconds"),
             query=request.query,

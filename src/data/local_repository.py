@@ -10,11 +10,14 @@ def _slug(s: str) -> str:
     return re.sub(r"[^a-zA-Z0-9_-]", "_", s)[:32]
 
 class LocalRepository:
-    def save_result(self, result: AnalysisResult) -> str:
+    @staticmethod
+    def save_result(result: AnalysisResult):
         ANSWERS_DIR.mkdir(exist_ok=True, parents=True)
+
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        fname = f"{ts}-{_slug(result.query)}.json"
-        path = ANSWERS_DIR / fname
+        filename = f"{ts}-{_slug(result.query)}.json"
+        path = ANSWERS_DIR / filename
+
         payload = {
             "timestamp": result.timestamp,
             "query": result.query,
@@ -22,4 +25,3 @@ class LocalRepository:
             "followups": result.followups,
         }
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-        return str(path)

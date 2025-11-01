@@ -13,35 +13,24 @@ class Orchestrator:
         self.strategy = strategy
         self.repository = repository
 
-    def run_single(self, query: str, followups: Optional[list] = None):
-        with sync_playwright() as p:
-            ctx = make_persistent_chrome(p)
-            try:
-                page = ensure_gemini_authenticated(ctx)
-                ctx.storage_state(path=str(AUTH_STATE_PATH))
-                client = GeminiClient(page)
-                req = QueryRequest(query=query, followups=followups or [])
-                result = self.strategy.run(client, req)
-                self.repository.save_result(result)
-                return result
-            finally:
-                ctx.close()
-
     def run_batch(self, queries_file: str):
         with sync_playwright() as p:
             ctx = make_persistent_chrome(p)
+
             try:
                 page = ensure_gemini_authenticated(ctx)
                 ctx.storage_state(path=str(AUTH_STATE_PATH))
                 client = GeminiClient(page)
                 defaults, segments = read_queries_file(queries_file)
                 results = []
+
                 for seg in segments:
-                    fups = seg["followups"] or (defaults or [])
-                    req = QueryRequest(query=seg["query"], followups=fups)
+                    followups = seg["followups"] or (defaults or [])
+                    req = QueryRequest(query=seg["query"], followups=followups)
                     res = self.strategy.run(client, req)
                     self.repository.save_result(res)
                     results.append(res)
+
                 return results
             finally:
                 ctx.close()
