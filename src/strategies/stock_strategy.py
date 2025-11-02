@@ -4,7 +4,7 @@ from src.data.models import QueryRequest, AnalysisResult
 
 class StockStrategy:
     def run(self, client: GeminiClient, request: QueryRequest) -> AnalysisResult:
-        pdf_path = client.execute_deep_research(request.query)
+        pdf_path = client.execute_deep_research(request.query, output_name=request.output_name)
         followups = client.ask_followups(request.followups)
         client.new_chat()
 
@@ -13,4 +13,5 @@ class StockStrategy:
             query=request.query,
             followups=followups,
             pdf_path=pdf_path,
+            output_name=request.output_name,
         )

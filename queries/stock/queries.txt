@@ -3,19 +3,22 @@ What is the fair price? (Answer concisely and directly. No extra words or explan
 ---FOLLOWUP_SEPARATOR---
 What is the buy price? (Answer briefly and precisely. No extra words or context. One word or number only if possible.)
 
----QUERY_SEPARATOR---
-Analyse the company Alphabet Inc. (Google) in detail.
-	1.	Obtain and summarise the current financial results.
-	2.	Compare valuations with historical values and competition.
-	3.	Identify the main growth drivers and risks.
-	4.	Determine the fair value of the stock (DCF and multiples).
-	5.	Propose price ranges when the stock is undervalued, fairly valued, and overvalued.
+---CONTENT_TEMPLATE---
+Analyse the company in detail.
+  1. Obtain and summarise the current financial results.
+  2. Compare valuations with historical values and competition.
+  3. Identify the main growth drivers and risks.
+  4. Determine the fair value of the stock (DCF and multiples).
+  5. Propose price ranges when the stock is undervalued, fairly valued, and overvalued.
 Provide output in tables and end with a short summary recommendation.
+---END_CONTENT_TEMPLATE---
+
 ---QUERY_SEPARATOR---
-Analyse the company Amazon in detail.
-	1.	Obtain and summarise the current financial results.
-	2.	Compare valuations with historical values and competition.
-	3.	Identify the main growth drivers and risks.
-	4.	Determine the fair value of the stock (DCF and multiples).
-	5.	Propose price ranges when the stock is undervalued, fairly valued, and overvalued.
-Provide output in tables and end with a short summary recommendation.
+---VARIABLES_SEPARATOR---
+!OUTPUT_NAME=Alphabet-2025-11-01
+Company: Alphabet Inc. (Google)
+
+---QUERY_SEPARATOR---
+---VARIABLES_SEPARATOR---
+!OUTPUT_NAME=Amazon-2025-11-01
+Company: Amazon

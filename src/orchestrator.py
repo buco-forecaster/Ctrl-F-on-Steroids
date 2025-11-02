@@ -26,7 +26,8 @@ class Orchestrator:
 
                 for seg in segments:
                     followups = seg["followups"] or (defaults or [])
-                    req = QueryRequest(query=seg["query"], followups=followups)
+                    output_name = seg.get("output_name") if "output_name" in seg else None
+                    req = QueryRequest(query=seg["query"], followups=followups, output_name=output_name)
                     res = self.strategy.run(client, req)
                     self.repository.save_result(res)
                     results.append(res)

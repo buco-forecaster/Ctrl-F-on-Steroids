@@ -2,15 +2,12 @@
 Return exactly one fenced code block (copy paste block). Show only the requested summary table inside the block. No text before or after. No extra blocks. No explanations or comments.
 Do not include backticks inside the block. Output only this code block so I can parse and store it as a string in Python.
 
----QUERY_SEPARATOR---
-VARIABLES:
-- LEAGUE: Premier League
-- MATCH_DATE: 01 November 2025
-- INCLUSION: Only matches confirmed to be played on MATCH DATE.
-
+---CONTENT_TEMPLATE---
 TITLE: DeepSearch Quantitative Value Bet Identification Protocol
 
 ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializing in football betting markets. Utilize advanced statistical modeling, multi-source data synthesis, and rigorous DeepSearch verification to identify statistically significant Value Bets with positive Expected Value (+EV).
+
+INCLUSION: Only matches confirmed to be played on MATCH_DATE.
 
 CORE CONSTRAINTS:
 - ODDS SOURCE: Primary: Fortuna SK (fortuna.sk). If unavailable, use a reputable Slovak fallback (e.g., Niké, Tipsport SK) and label it as Fallback: [Name].
@@ -74,3 +71,16 @@ COLUMN RULES:
 - Decimal Odds must have exactly two decimal places (e.g., 2.00).
 - Sources: Must contain short, numbered inline links (e.g., [1](url) [2](url)) referencing direct URLs used for critical data.
 - Evidence: A concise, data-driven justification (max 200 characters) referencing key signals and including the odds retrieval timestamp. Example: "HOME npxG differential +0.5 over L8 [1]; AWAY key defender (Player X) injured [2]; Model favors Over. Odds retrieved 01 Nov 23:30 UTC."
+---END_CONTENT_TEMPLATE---
+
+---QUERY_SEPARATOR---
+---VARIABLES_SEPARATOR---
+VARIABLES:
+- LEAGUE: Premier League
+- MATCH_DATE: 02 November 2025
+
+---QUERY_SEPARATOR---
+---VARIABLES_SEPARATOR---
+VARIABLES:
+- LEAGUE: Serie A
+- MATCH_DATE: 02 November 2025
