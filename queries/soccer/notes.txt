@@ -1,0 +1,2 @@
+# Odds from fortuna (must be parsed from other website)
+# Final table should contain all bets (not only bests) + ROI and Confidence columns

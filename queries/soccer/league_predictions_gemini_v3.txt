@@ -4,6 +4,27 @@ Do not include backticks inside the block. Output only this code block so I can 
 
 ---QUERY_SEPARATOR---
 ---VARIABLES_SEPARATOR---
+!OUTPUT_NAME=soccer_premier_league_2025-11-02
+VARIABLES:
+- LEAGUE: Premier League
+- MATCH_DATE: 02 November 2025
+
+---QUERY_SEPARATOR---
+---VARIABLES_SEPARATOR---
+!OUTPUT_NAME=soccer_serie_a_2025-11-02
+VARIABLES:
+- LEAGUE: Serie A
+- MATCH_DATE: 02 November 2025
+
+---QUERY_SEPARATOR---
+---VARIABLES_SEPARATOR---
+!OUTPUT_NAME=soccer_la_liga_2025-11-02
+VARIABLES:
+- LEAGUE: La Liga
+- MATCH_DATE: 02 November 2025
+
+---QUERY_SEPARATOR---
+---VARIABLES_SEPARATOR---
 !OUTPUT_NAME=soccer_bundesliga_2025-11-02
 VARIABLES:
 - LEAGUE: Bundesliga
@@ -24,7 +45,7 @@ ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializi
 INCLUSION: Only matches confirmed to be played on MATCH_DATE.
 
 CORE CONSTRAINTS:
-- ODDS SOURCE: Primary: Fortuna SK (fortuna.sk). If unavailable, use a reputable Slovak fallback (e.g., Niké, Tipsport SK) and label it as Fallback: [Name].
+- ODDS SOURCE: Always retrieve odds from Fortuna SK (fortuna.sk) first. If Fortuna odds are not accessible, get them from Flashscore (it mirrors Fortuna odds). If neither source works, use a reliable Slovak bookmaker such as Niké or Tipsport SK and clearly label the source as Fallback: [Bookmaker Name].
 - ODDS RANGE: Decimal odds strictly between 1.30 and 7.00.
 - ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5).
 - FORBIDDEN MARKETS: Both Teams To Score (BTTS), Corners, Cards, Asian Handicaps.

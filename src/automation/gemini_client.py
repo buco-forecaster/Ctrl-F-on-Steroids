@@ -15,7 +15,7 @@ class GeminiClient:
         new_chat_btn = self.page.locator('[aria-label="New chat"]')
         new_chat_btn.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
         new_chat_btn.click()
-        time.sleep(2)
+        time.sleep(3)
 
     def execute_deep_research(self, query: str, output_name: str) -> str:
         if not output_name or not output_name.strip():
@@ -63,7 +63,7 @@ class GeminiClient:
     def wait_for_answer(self, text, state) -> None:
         just_sec = self.page.get_by_text(text).last
         just_sec.wait_for(state=state, timeout=DEFAULT_DEEP_RESEARCH_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(3)
 
     def ask_and_capture(self, q: str) -> str:
         box = self.page.get_by_role("textbox")
@@ -86,17 +86,17 @@ class GeminiClient:
         with self.page.expect_popup(timeout=DEFAULT_TIMEOUT_MS) as popup_info:
             menuitem = self.page.get_by_role("menuitem", name=L.RE_EXPORT_TO_DOCS)
             menuitem.click(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(5)
+        time.sleep(10)
 
         doc_page = popup_info.value
         file_menu = doc_page.get_by_role("menuitem", name="File")
         file_menu.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
         file_menu.click(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(1.5)
 
         download_menu = doc_page.get_by_role("menuitem", name="Download")
         download_menu.hover(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(1.5)
 
         pdf_item = doc_page.get_by_role("menuitem", name="PDF Document")
         with doc_page.expect_download(timeout=DEFAULT_TIMEOUT_MS) as dl_info:
@@ -118,7 +118,7 @@ class GeminiClient:
 
         base_name = output_name.strip().replace(" ", "_")[:64]
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_path = f"{out_dir}/{timestamp}-{base_name}.pdf"
+        out_path = f"{out_dir}/{base_name}.pdf"
 
         downloaded_file.save_as(out_path)
         return out_path
