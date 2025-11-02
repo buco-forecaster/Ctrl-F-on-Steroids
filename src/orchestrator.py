@@ -1,4 +1,5 @@
 from typing import List, Optional
+from pathlib import Path
 from playwright.sync_api import sync_playwright
 from config.settings import AUTH_STATE_PATH
 from src.automation.browser_manager import make_persistent_chrome
@@ -19,6 +20,8 @@ class Orchestrator:
 
             try:
                 page = ensure_gemini_authenticated(ctx)
+                # Ensure .auth folder exists before writing storage_state
+                Path(AUTH_STATE_PATH).parent.mkdir(parents=True, exist_ok=True)
                 ctx.storage_state(path=str(AUTH_STATE_PATH))
                 client = GeminiClient(page)
                 defaults, segments = read_queries_file(queries_file)
