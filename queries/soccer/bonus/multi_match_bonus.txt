@@ -2,7 +2,7 @@
 ODDS_SUMMARY_TABLE: |
     Return exactly one plain Markdown table. Do not use a code block. Show only the requested summary (tickets) tables.
     No text before or after. No extra blocks. No explanations or comments. Do not include backticks. Output only the table so it can be parsed and stored as a Python string.
-TICKET_LIST: |
+RESULT: |
     Prompt: Your response must be only a single fenced code block containing a valid JSON object.
 
     Strict Output Requirements:
@@ -31,11 +31,11 @@ TICKET_LIST: |
             "Selection": "Aston Villa",
             "Bookmaker": "Fortuna SK",
             "Decimal Odds": "2.50",
-            "Fair Implied Probability (%)": "40.0%",
-            "Model Probability (%)": "50.0%",
-            "Edge (%)": "10.0%",
-            "ROI (%) (Standard)": "25.0%",
-            "Margin (%)": "5.0%",
+            "Fair Implied Probability": "40.0%",
+            "Model Probability": "50.0%",
+            "Edge": "10.0%",
+            "ROI": "25.0%",
+            "Margin": "5.0%",
             "Confidence (0-10)": 9
           },
           "CRY_vs_MUN": {
@@ -45,11 +45,11 @@ TICKET_LIST: |
             "Selection": "Crystal Palace",
             "Bookmaker": "Fortuna SK",
             "Decimal Odds": "2.50",
-            "Fair Implied Probability (%)": "40.0%",
-            "Model Probability (%)": "50.0%",
-            "Edge (%)": "10.0%",
-            "ROI (%) (Standard)": "25.0%",
-            "Margin (%)": "5.0%",
+            "Fair Implied Probability": "40.0%",
+            "Model Probability": "50.0%",
+            "Edge": "10.0%",
+            "ROI": "25.0%",
+            "Margin": "5.0%",
             "Confidence (0-10)": 9
           }
         },
@@ -68,11 +68,11 @@ TICKET_LIST: |
             "Selection": "Over 2.5",
             "Bookmaker": "Bet365",
             "Decimal Odds": "1.80",
-            "Fair Implied Probability (%)": "55.0%",
-            "Model Probability (%)": "60.0%",
-            "Edge (%)": "5.0%",
-            "ROI (%) (Standard)": "9.1%",
-            "Margin (%)": "3.0%",
+            "Fair Implied Probability": "55.0%",
+            "Model Probability": "60.0%",
+            "Edge": "5.0%",
+            "ROI (Standard)": "9.1%",
+            "Margin": "3.0%",
             "Confidence (0-10)": 7
           }
         },
@@ -109,8 +109,6 @@ MATCH_DATE: 03 November 2025
 TITLE: DeepSearch Optimized Accumulator (AKO) Strategy Protocol
 ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist. Your objective is to construct accumulator bets (tickets) that maximize the probability of winning while ensuring long-term positive Return on Investment (ROI), adhering strictly to the defined constraints and bonus structure. Utilize advanced statistical modeling, multi-source data synthesis (internal models + external prediction sites), and rigorous data verification.
 
-# Define the rules and optimization goals.
-# ----------------------------------------------------------------
 - PRIMARY OBJECTIVE: Maximize the Probability of Winning the entire accumulator (P(Win_Ticket)). This is critical for sustainability.
 - SECONDARY OBJECTIVE: Maximize the Boosted ROI (ROI_Ticket_Boosted).
 - ROI REQUIREMENT: ROI_Ticket_Boosted MUST be positive (>0%).
@@ -123,14 +121,11 @@ ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist. Your obje
 - ALLOWED MARKETS: 1X2 (Full Time Result), Over/Under (Total Goals - all lines, e.g., 1.5, 2.5), Both Teams To Score (BTTS).
 - FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps, Draw No Bet, Player Props.
 
-# Define the step-by-step execution process.
-# ----------------------------------------------------------------
-
 PHASE 1: DATA SYNTHESIS AND ACQUISITION
 1) SCOPE: Identify all matches within the defined LEAGUES playing on MATCH_DATE. List kickoff times in UTC.
 2) ODDS & MARGIN: Retrieve current odds from the ODDS SOURCE HIERARCHY for all ALLOWED MARKETS. Record the UTC timestamp. Calculate the Bookmaker Margin (Vigorish).
 3) CORE METRICS (Fbref Primary, SoccerSTATS/Flashscore Secondary):
-   - npxG (Non-Penalty Expected Goals) and npxGA (Allowed) - Season-to-date and rolling last 8 matches.
+   - npxG (Non-Penalty Expected Goals) and npxGA (Allowed) - Season-to-date and rolling last 6 matches.
    - Set-Piece effectiveness and vulnerabilities.
    - Shooting Efficiency (Goals minus xG).
 4) BASELINE STRENGTH: Acquire current Elo ratings and recent trends (last 30 days) from clubelo.com.
@@ -177,18 +172,16 @@ This phase uses combinatorial optimization to maximize P(Win_Ticket).
 PHASE 5: OUTPUT GENERATION
 1) FORMATTING: Generate the output as specified below. Sort selections within each ticket by Confidence (descending).
 
-# Define the required output structure.
-# ----------------------------------------------------------------
 Present the results as separate tables for each ticket. Include summary statistics below each table.
 
 Ticket 1:
-| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability (%) | Model Probability (%) | Edge (%) | ROI (%) (Standard) | Margin (%) | Confidence (0-10) |
-|--------|-------|------------------|-----------|---------------|--------------|------------------------------|-----------------------|----------|--------------------|------------|-------------------|
-| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               | [X.X%]   | [X.X%]             | [X.X%]     | [0-10]            |
-| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               | [X.X%]   | [X.X%]             | [X.X%]     | [0-10]            |
-| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               | [X.X%]   | [X.X%]             | [X.X%]     | [0-10]            |
-| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               | [X.X%]   | [X.X%]             | [X.X%]     | [0-10]            |
-| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               | [X.X%]   | [X.X%]             | [X.X%]     | [0-10]            |
+| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability | Model Probability | Edge   | ROI (Standard) | Margin | Confidence (0-10) |
+|--------|-------|------------------|-----------|---------------|--------------|--------------------------|-------------------|--------|----------------|--------|-------------------|
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
 
 **Ticket 1 Summary:**
 *   Total Accumulator Odds (Odds_Ticket): [X.XX]
@@ -196,7 +189,3 @@ Ticket 1:
 *   Boosted ROI (ROI_Ticket_Boosted): [XX.X%]
 
 [Repeat Table and Summary for Ticket 2 to NUMBER_OF_TICKETS]
-
-COLUMN RULES:
-- Percentages (Fair Implied, Model, Edge, ROI, Margin, P(Win_Ticket)) must be rounded to one decimal place (e.g., 5.1%).
-- Decimal Odds (Individual and Total) must have exactly two decimal places (e.g., 2.00).

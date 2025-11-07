@@ -6,81 +6,107 @@ ODDS_SUMMARY_TABLE: |
   No text before or after. No extra blocks.
   No explanations or comments. Do not include backticks.
   Output only the table so it can be parsed and stored as a Python string.
+RESULT: |
+    Prompt: Your response must be only a single fenced code block containing a JSON object.
+    Strict Output Requirements:
+      1) Do not include any text, explanations, or comments before or after the JSON code block.
+      2) The root must be a single JSON object.
+      3) The top-level keys for this object must be strings representing a soccer match, using standard 3-letter team codes in the format HOME_vs_AWAY (e.g., AVL_vs_MCI).
+      4) The value for each top-level key must be an object that follows the exact structure shown in the example below.
 
+    Example JSON Structure:
+    "AVL_vs_MCI": {
+        "League": "Premier League",
+        "Home Team": "Aston Villa",
+        "Away Team": "Manchester City",
+        "Market": "Home win and BTTS",
+        "Final Probability": "45%",
+        "Fair Odds": "2.22",
+        "Given Odd": "2.50",
+        "EV": "11.0%",
+        "Value Detected?": "Yes"
+    }
 ---
+
 @GLOBALS
 MATCH_DATE: 07 November 2025
-
 ---
+
 @SEGMENT
 ANALYSIS_ID: elche_vs_villarreal
 LEAGUE: La Liga
 HOME: Elche
 AWAY: Villarreal
-
 ---
-@SEGMENT
-ANALYSIS_ID: paris_fc_vs_rennes
-LEAGUE: Ligue 1
-HOME: Paris FC
-AWAY: Rennes
 
----
-@SEGMENT
-ANALYSIS_ID: werder_bremen_vs_wolfsburg
-LEAGUE: Bundesliga
-HOME: Werder Bremen
-AWAY: Wolfsburg
-
----
 @CONTENT
-TITLE: Statistically Calibrated Deep-Search Analysis: [HOME] vs [AWAY] ({MATCH_DATE}) - 1X2 and Over/Under Probabilities
+TITLE: Statistically Calibrated Deep-Search Analysis: [HOME] vs [AWAY] ({MATCH_DATE}) - 1X2, Over/Under and BTTS Value Bet Identification
+ROLE: Act as an expert sports analyst and data scientist for football betting. Use advanced statistical methods and DeepSearch web research to identify Value Bets. Follow all constraints
+      and return only the requested output.
+OBJECTIVE: Synthesize quantitative and qualitative data from multiple verified sources to produce the most accurate, statistically calibrated pre-match analysis for the specified fixture.
+           The analysis must result in calculated probabilities for 1X2, Over/Under and BTTS markets, compared against primary bookmaker odds. Scrape and integrate model probabilities from
+           reputable prediction sites (e.g., Forebet, SoccerStats, Betensured, EaglePredict, FootballWhispers)
 
-ROLE: Act as an expert sports analyst and data scientist for football betting. Use advanced statistical methods and DeepSearch web research to identify Value Bets. Follow all constraints and return only the requested output.
+CORE CONSTRAINTS:
+- ODDS SOURCE:
+  - Primary: Fortuna SK (ifortuna.sk).
+  - Secondary: OddsPortal (https://www.oddsportal.com/) which mirrors ifortuna.cz; ifortuna.cz odds are equivalent to ifortuna.sk.
+  - Tertiary: Niké (nike.sk)
+  - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
+- ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
+- ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5), Both Teams To Score (BTTS).
+- FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps.
+- CITATION MANDATE: All critical data points (stats, odds, key news) MUST be cited with a direct URL.
 
-OBJECTIVE: Synthesize quantitative and qualitative data from multiple verified sources to produce the most accurate, statistically calibrated pre-match analysis for the specified fixture. The analysis must result in calculated probabilities for 1X2 and Over/Under markets, compared against primary bookmaker odds.
+EXECUTION PROTOCOL:
+PHASE 1: MARKET INTAKE AND DATA ACQUISITION
+1) Identify the target fixture.
+2) Market Data: Retrieve current odds from the ODDS SOURCE hierarchy for all ALLOWED MARKETS.
+   - Crucial: Record the exact UTC timestamp of odds retrieval and the precise source (Fortuna, OddsPortal/ifortuna.cz mirror, or Fallback).
+   - Calculate the Bookmaker Margin (Vigorish) for each market. (Margin = (1/Odds1 + 1/Odds2 + ... + 1/OddsN) - 1). Prioritize analysis on markets with the lowest margin.
+3) Advanced Metrics (Season-to-date & Last 6 matches): Acquire and verify data from Fbref (Primary) and Flashscore (Secondary):
+   - Non-Penalty Expected Goals (npxG) and Non-Penalty Expected Goals Allowed (npxGA).
+   - Set-Piece xG and xGA.
+   - Shot-Creating Actions (SCA) or Progressive Carries/Passes (as proxies for offensive threat).
+   - Shooting Efficiency (Goals minus xG).
+4) Baseline Strength: Acquire current Elo ratings and recent trends (last 30 days) from clubelo.com.
+5) Situational Data: Acquire injury/suspension data (Flashscore, official club announcements or similar pages), schedule context (days of rest), and tactical styles (WhoScored).
+6) External Prediction Synthesis: Scrape and integrate model probabilities from reputable prediction sites (e.g., Forebet, SoccerStats, Betensured, EaglePredict, FootballWhispers).
 
-DATA ACQUISITION STRATEGY & PRIORITIZATION: Execute a comprehensive data search using the following prioritized sources.
-1) Expected Goals (xG) and Advanced Stats (Season-to-date): Fbref (Primary for xG, xGA, SCA), WhoScored (Secondary).
-2) Recent Form & Scoring Trends (Last 6 matches): SoccerSTATS (Home/Away splits, scoring times), Fbref.
-3) Team Strength Rating: Clubelo (Current Elo ratings).
-4) Tactical Analysis & Predicted Lineups: WhoScored (styles, formations). Verify predicted lineups and team news with reputable sports news sources updated within 48 hours of the DATA CUTOFF.
-5) Injury and Suspension Data: Flashscore, official club announcements or similar pages.
-6) Market Odds: Fortuna SK (Primary source for 1X2, O/U 2.5, O/U 3.5).
+PHASE 2: FEATURE ENGINEERING AND SIGNAL GENERATION
+1) Form Analysis: Calculate weighted form metrics, emphasizing home/away splits using SoccerSTATS and Fbref.
+2) xG Differentials: Calculate rolling npxG differentials (npxG - npxGA) over the last 6 matches. Identify teams significantly over- or under-performing their underlying metrics (candidates for regression).
+3) Qualitative Impact Quantification:
+   - Quantify the impact of key injuries/suspensions on team npxG and npxGA based on player contribution data (Fbref). (e.g., "Absence of Player X reduces team npxG expectancy by 0.2 based on their season contribution").
+4) H2H Context: Analyze the last 3 H2H meetings (Fbref match logs), focusing on tactical setups and xG flow, rather than just results.
 
-CORE METHODOLOGY (INTERNAL GUIDANCE): The analysis must internally utilize these principles to justify the output numbers:
-1) Data Synthesis: Integrate advanced metrics (xG differentials), baseline strength (Elo), recent performance trends (weighing the last 6 matches appropriately), and qualitative factors (critical injuries, tactical matchups, H2H context).
-2) Goal Expectancy Modeling: Utilize a recognized statistical model (e.g., customized Poisson distribution, Negative Binomial, or an ensemble approach blending Elo and xG). Calculate HOME and AWAY Attack/Defense Strengths based on respective xG scored and xG conceded, adjusted for home/away splits.
-3) Calibration: Calibrate the model outputs against the current LEAGUE season's average scoring rates and home-field advantage statistics.
-4) Adjustments: Apply evidence-based adjustments based on the qualitative factors synthesized in Step 1 (e.g., quantifying the impact of key missing players on team xG/xGA).
+PHASE 3: PROBABILITY MODELING AND CALIBRATION
+1) Model Implementation: Utilize an Ensemble Model blending:
+   - A customized Poisson or Negative Binomial distribution based on adjusted Attack/Defense strengths (derived from npxG/npxGA, recent form, and qualitative adjustments from Phase 2).
+   - An Elo-based probability calculation.
+2) Calibration: Calibrate the model outputs against the current LEAGUE season's averages (e.g., average goals per game, home-field advantage coefficient, draw frequency).
+3) Model Probability: Generate the 'Model Probability' (True Probability) for all outcomes in the 1X2 and relevant O/U markets.
+4) Synthesis & Calibration: Combine the internal Ensemble Model outputs with the External Prediction data using a weighted average approach.
 
-STRICT CONSTRAINTS & RULES:
-1) Verification and Citation: Every non-trivial claim, statistic, injury report, and odds value MUST be cited with a direct, working URL in the Citations block.
-2) No Fabrication: Do not fabricate data. If a specific data point cannot be verified, display "Unknown" in the table and explain the missing information in the Notes section.
-3) Conflict Resolution: If sources disagree (e.g., different xG values), prioritize the sources as listed in the Data Acquisition Strategy (e.g., Fbref for xG). Document the conflict and the chosen resolution in the Notes.
-4) Odds Source and Fallback: Fetch current odds from Fortuna SK as close to the DATA CUTOFF time as possible. If Fortuna SK is unavailable for any requested market, use a reputable Slovak fallback bookmaker (e.g., Tipsport SK). Clearly state the source used and the exact timestamp (UTC) of retrieval in the Notes.
+PHASE 4: VALUE IDENTIFICATION AND PRIORITIZATION
+1) Fair Implied Probability: Calculate the bookmaker's implied probability (1/Odds). Remove the margin calculated in Phase 1 to determine the 'Fair Implied Probability' (probabilities rescaled to sum to 100%).
+2) Edge Calculation: Edge = Model Probability - Fair Implied Probability.
+3) ROI Calculation: ROI (Expected Return on Investment) = (Model Probability * Decimal Odds) - 1.
+4) Selection Filter:
+   - Include selections that meet Core Constraints (markets, sources, {ODDS_RANGE}).
+   - Do not restrict to “best” picks only; consider all qualifying selections across allowed markets for each match.
 
-TASKS:
-1) Compute calibrated outcome probabilities for Home Win, Draw, and Away Win (must sum to 100%).
-2) Convert these probabilities to Fair Odds (1 / probability), displayed as decimal odds with exactly two decimals and zero margin (no vigorish).
-3) Fetch current Fortuna SK decimal odds for the 1X2 market.
-4) Compute calibrated probabilities for Over 2.5, Under 2.5, Over 3.5, and Under 3.5.
-5) Convert these probabilities to Fair Odds (two decimals, zero margin).
-6) Fetch current Fortuna SK decimal odds for the O/U 2.5 and O/U 3.5 markets.
+PHASE 5: OUTPUT GENERATION (FINAL TABLE MUST INCLUDE ALL QUALIFYING BETS)
+1) External Cross-Check: Compare the generated Value Bets against analysis from reputable analytical sources (Betarena, Covers, Forebet, SoccerStats, Betensured, EaglePredict, FootballWhispers). Note significant disagreements in the Evidence column.
+2) Mandatory Output Rules:
+   - The final table MUST contain ALL selections that passed the filtering stage (not only bests).
+   - Columns MUST include ROI and Confidence (0–10).
+   - Sort the table by Confidence (descending), then ROI (descending).
+3) Output: Generate the final table.
 
-OUTPUT FORMAT: Return exactly the following two markdown tables, followed by the Notes and Citations sections. Do not include any preamble, introduction, summary, or filler text. Use whole numbers for percentages (e.g., 50%) and two decimals for odds (e.g., 2.00).
+OUTPUT FORMAT:
+Return Markdown table.
 
-TABLE 1: 1X2 | League | Home Team | Away Team | Home Win (%) | Draw (%) | Away Win (%) | Fair Odds Home | Fair Odds Draw | Fair Odds Away | Fortuna Odds Home | Fortuna Odds Draw | Fortuna Odds Away | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] |
-
-TABLE 2: Over/Under 2.5 and 3.5 | League | Home Team | Away Team | Market | Probability (%) | Fair Odds | Fortuna Odds | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | Over 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Over 3.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 3.5 | [Value] | [Value] | [Value] |
-
-Notes:
-- [Briefly detail the specific methodology used, e.g., "Ensemble model (xG-based Poisson + Elo) calibrated to league average of X.XX goals/game."]
-- [List any data conflicts and resolutions.]
-- [List any missing data (Unknowns) and their potential impact on uncertainty.]
-- [Confirm the odds source used (Fortuna or Fallback) and the timestamp (UTC) when odds were retrieved.]
-
-VALIDATION CHECKLIST (SELF-CORRECTION):
-- Do the probabilities in Table 1 sum to 100%?
-- Do the Over/Under probabilities for each threshold (2.5 and 3.5) sum to 100%?
-- Are Fair Odds calculated correctly as 1/probability with two decimals and zero margin?
+| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability | Model Probability | Edge   | ROI (Standard) | Margin | Confidence (0-10) |
+|--------|-------|------------------|-----------|---------------|--------------|--------------------------|-------------------|--------|----------------|--------|-------------------|
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |

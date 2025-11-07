@@ -1,3 +1,0 @@
-# Odds from fortuna (must be parsed from other website) SECONDARY ODDS SOURCE: https://www.oddsportal.com/ -> It contains odds from ifortuna.cz which are the same as ifortuna.sk
-# Final table should contain all bets (not only bests) + ROI and Confidence columns
-# In table should be name of the teams only shortened team codes (e.g., Aston Villa -> AVL)

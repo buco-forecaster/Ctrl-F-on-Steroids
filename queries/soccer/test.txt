@@ -122,9 +122,9 @@ TASKS:
 
 OUTPUT FORMAT: Return exactly the following two markdown tables, followed by the Notes and Citations sections. Do not include any preamble, introduction, summary, or filler text. Use whole numbers for percentages (e.g., 50%) and two decimals for odds (e.g., 2.00).
 
-TABLE 1: 1X2 | League | Home Team | Away Team | Home Win (%) | Draw (%) | Away Win (%) | Fair Odds Home | Fair Odds Draw | Fair Odds Away | Fortuna Odds Home | Fortuna Odds Draw | Fortuna Odds Away | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] |
+TABLE 1: 1X2 | League | Home Team | Away Team | Home Win | Draw | Away Win | Fair Odds Home | Fair Odds Draw | Fair Odds Away | Fortuna Odds Home | Fortuna Odds Draw | Fortuna Odds Away | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] |
 
-TABLE 2: Over/Under 2.5 and 3.5 | League | Home Team | Away Team | Market | Probability (%) | Fair Odds | Fortuna Odds | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | Over 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Over 3.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 3.5 | [Value] | [Value] | [Value] |
+TABLE 2: Over/Under 2.5 and 3.5 | League | Home Team | Away Team | Market | Probability | Fair Odds | Fortuna Odds | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | Over 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Over 3.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 3.5 | [Value] | [Value] | [Value] |
 
 Notes:
 - [Briefly detail the specific methodology used, e.g., "Ensemble model (xG-based Poisson + Elo) calibrated to league average of X.XX goals/game."]
