@@ -1,0 +1,113 @@
+@DEFAULT_FOLLOWUPS
+COMPANY: Return the exact legal company name for ticker {TICKER} as of {VALUATION_DATE}. Output only the name or Unknown.
+ANALYSIS_DATE: Return the analysis date as YYYYMMDD. Output only the 8 digit date.
+FAIR_VALUE_USD: Return the fair value per share in USD. Output only a number with optional decimals.
+PRICE_BANDS_USD: Return four numbers in this order as CSV without spaces buy_max hold_min hold_max sell_min. Output only numbers comma separated. Example format 225,225,290,290.
+CURRENT_PRICE_USD: Return the official close price in USD on {VALUATION_DATE}. Output only a number with optional decimals.
+RECOMMENDATION: Based on fair value vs current price return exactly one word from this set Buy Hold Sell. Output only that word.
+KEY_RISKS: Return exactly three risk tags as lowercase snake case separated by commas no spaces. If unknown return Unknown. Example format regulation,ai_costs,competition.
+KEY_CATALYSTS: Return exactly three catalyst tags as lowercase snake case separated by commas no spaces. If unknown return Unknown. Example format cloud_growth,ai_monetization,youtube.
+SHORT_SUMMARY: Short summary. Return a single concise line 6 to 12 words ascii only no punctuation. If unknown return Unknown.
+---
+@SEGMENT
+ANALYSIS_ID: stock_amazon
+Company: Amazon
+Ticker: AMZN
+Currency: USD
+Valuation Date: November 1, 2025
+---
+@CONTENT
+2. TITLE: DeepSearch Equity Valuation: {COMPANY} (TICKER: {TICKER}) - DCF, SOTP, and Scenario Analysis
+
+3. ROLE AND OBJECTIVE
+  - ROLE: Act as an expert Quantitative Equity Research Analyst specializing in the TMT (Technology, Media, and Telecom) sector. Utilize Gemini DeepSearch capabilities for precise data extraction directly from primary source documents and reputable financial databases.
+  - OBJECTIVE: Produce a comprehensive, audit-ready, and segment-level intrinsic valuation of {COMPANY}. Determine the Fair Value Per Share (FVPS) and identify potential mispricing by comparing the FVPS against the market price as of the {VALUATION_DATE}.
+
+4. DATA PROTOCOL AND CONSTRAINTS
+  - DATA CUTOFF (CRITICAL): Strictly use market data as of the close of business (US/Eastern Time) on the {VALUATION_DATE}. Use the latest available financial filings (10-K, 10-Q) released prior to this date. Do not incorporate any events or data released after the cutoff.
+  - CITATION MANDATE (MANDATORY): Every material number MUST be cited with a direct URL. For PDF filings (10-K, 10-Q, Transcripts), the citation MUST include the specific document date AND the exact page number.
+  - DATA INTEGRITY: Do not use paywalled analyst reports or non-verifiable consensus estimates. If a value cannot be verified, state "Unknown" and explain the implication in the Notes.
+  - FORMATTING: Currency in millions (except per-share data, two decimals). Margins/Growth: one decimal (X.X%). Clearly label time periods (TTM, LTM, or FY).
+
+5. DEEPSEARCH DATA ACQUISITION STRATEGY
+Prioritize data extraction strictly in this hierarchical order:
+  1) Primary Filings (Mandatory):
+    - SEC EDGAR (Forms 10-K, 10-Q, 8-K). Prioritize structured XBRL data extraction.
+    - Specific sections to target: "Management’s Discussion and Analysis (MD&A)", "Notes to Consolidated Financial Statements" (specifically Segment Reporting, Leases, Debt, PP&E, and Share Capital), "Risk Factors".
+  2) Investor Relations Context: {COMPANY} Investor Relations (Earnings Decks, Conference Call Transcripts).
+  3) Market and Macro Data: Reputable providers (e.g., Yahoo Finance) for prices/share counts. St. Louis Fed (FRED) for Treasury rates.
+  4) Standardized Inputs: Reputable public sources for Equity Risk Premium (e.g., Damodaran's public data).
+
+6. VALUATION METHODOLOGY PROTOCOL
+6.1. WACC (Weighted Average Cost of Capital) Calculation:
+  - Risk-Free Rate (Rf): Yield on the US 10-year Treasury bond on the {VALUATION_DATE} (Source: FRED).
+  - Beta (β): Calculate or source using a 5-year monthly regression against the S&P 500.
+  - Equity Risk Premium (ERP): Use a documented, current public estimate.
+  - Cost of Debt: Pre-tax cost based on current yields of {COMPANY}'s outstanding bonds or synthesized credit rating.
+  - Tax Rate: Forward-looking marginal tax rate.
+  - Capital Structure (Crucial): Use market value of equity. For debt, include reported debt AND the present value of capitalized operating leases.
+    - DeepSearch Action: Extract future operating lease commitments from the "Leases" or "Commitments and Contingencies" footnotes in the latest 10-K/10-Q. Calculate the PV using the pre-tax Cost of Debt as the discount rate.
+
+6.2. Segment-Level Forecasting (10-Year Horizon: 5 Explicit + 5 Convergence):
+  - Deconstruct {COMPANY} into its reportable operating segments.
+  - Forecast revenue growth (Volume/Price drivers) and operating margins separately for each segment.
+  - DeepSearch Action: Synthesize qualitative insights extracted from the MD&A, Risk Factors, and Earnings Transcripts to justify the quantitative forecasts. Specifically analyze and incorporate:
+    - Revenue Dynamics: TAM growth, secular trends, competitive advantages (Moat analysis), and market share trajectory.
+    - Margin Trajectory & Operating Leverage: Cost structure analysis (Fixed vs. Variable), economies of scale, efficiency gains, and convergence towards steady-state margins.
+    - Disruption & Innovation: Impact of R&D effectiveness, emerging technologies, and competitive landscape shifts.
+    - Capital Intensity: Forecast Growth and Maintenance Capex. Adjust D&A based on useful lives of assets (found in PP&E footnotes).
+    - Regulatory & External Risks: Financial impact of regulatory headwinds, litigation risks, and geopolitical factors.
+
+6.3. Discounted Cash Flow (DCF) - FCFF Approach:
+  - Methodology: Free Cash Flow to the Firm (FCFF).
+  - SBC Treatment (Mandatory): Treat Stock-Based Compensation (SBC) as a true cash expense (subtract it when calculating FCFF).
+  - Reinvestment: Model NWC and Capex needs using Sales-to-Capital ratios or target ROIC.
+  - Terminal Value: Gordon Growth Model. The terminal growth rate MUST NOT exceed the long-term nominal GDP growth rate. Cross-check the implied EV/EBITDA exit multiple.
+  - Discount Rate: Use the calculated WACC.
+
+6.4. Sum-of-the-Parts (SOTP) Multiples Valuation:
+  - Application: Utilize if segments have significantly different growth, margin, and risk profiles.
+  - Peer Group Selection: For each segment, identify relevant "pure-play" public comparables.
+  - Metric Selection: Select appropriate metrics (e.g., EV/Sales for high growth; EV/EBITDA for mature). Normalize for non-recurring items.
+  - Valuation Application: Calculate the benchmark multiple (specify Median or Mean) of the peer group. Apply the multiple to the segment's metric. Explicitly justify any premium or discount applied.
+  - Non-Core Assets: Value early-stage ventures or non-operating assets separately (e.g., recent funding rounds, book value, or zero if highly uncertain).
+  - Aggregation: Aggregate the EVs. Adjust for unallocated corporate overhead. Consider and justify a "Conglomerate Discount" (5-15%) if applicable.
+
+6.5. Synthesis and Analysis:
+  - Blended Valuation: Assign weights to the DCF and SOTP valuations (e.g., 70% DCF, 30% SOTP) and justify the weighting.
+  - Scenario Analysis: Define Bear, Base, and Bull cases with probabilities (summing to 100%). Drivers must be specific to the key controversies facing {COMPANY} (e.g., regulatory outcomes, competitive disruption, margin realization in growth segments).
+  - Reverse DCF: Input the market price as of {VALUATION_DATE} and solve for the required Revenue CAGR (Y1-10) and Steady-State Operating Margin that justify the price. Assess the plausibility (Aggressive, Realistic, Conservative) of these implied assumptions.
+
+7. OUTPUT REQUIREMENTS
+Return only the following tables, followed by the Investment Thesis, Notes, and Citations.
+
+TABLE A: Market Snapshot (As of {VALUATION_DATE}) | Date | Ticker | Price ($) | Market Cap ($M) | Cash & Equiv. ($M) | Reported Debt ($M) | Capitalized Leases ($M) | Total Debt ($M) | Net Cash/Debt ($M) | Enterprise Value ($M) | Diluted Shares (M) | Source (Link/Page) | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+
+TABLE B: Financial Summary (TTM and Last FY) | Metric | TTM ($M) | Last FY ($M) | Source (Document & Page) | | :--- | :--- | :--- | :--- | | Revenue | | | | | Gross Margin (%) | | | | | Operating Margin (%) | | | | | FCFF (SBC adjusted) | | | | | Capex | | | | | SBC Expense | | | |
+
+TABLE C: WACC Calculation | Component | Value | Source/Notes/Methodology | | :--- | :--- | :--- | | Risk-Free Rate (%) | | | | Beta | | [e.g., 5Y Monthly vs S&P500] | | Equity Risk Premium (%) | | | | Cost of Equity (%) | | | | Cost of Debt (Pre-tax) (%) | | | | Marginal Tax Rate (%) | | | | Weight of Equity (%) | | | | Weight of Debt (incl. Leases) (%) | | | | WACC (%) | | |
+
+TABLE D: DCF Assumptions (Base Case) | Segment/Driver | Rev CAGR (Y1-5) (%) | Target/Steady State Op Margin (%) | Key Drivers/Notes (Qualitative Justification) | | :--- | :--- | :--- | :--- | | [Segment 1 Name] | | | | | [Segment 2 Name] | | | | | Consolidated | | | | | WACC (%) | N/A | N/A | [Value] (From Table C) | | Terminal Growth Rate (%) | N/A | N/A | [Value] (≤ GDP growth) |
+
+TABLE E: DCF Results | Component | Value ($M) | Notes | | :--- | :--- | :--- | | PV of Explicit FCFF (Y1-10) | | | | PV of Terminal Value | | | | Total Enterprise Value | | | | Less: Total Debt (incl. Leases) | | | | Add: Cash & Equivalents | | | | Equity Value | | | | Fair Value Per Share (DCF) | [$X.XX] | | | Implied Upside/Downside (%) | | |
+
+TABLE F: SOTP Multiples Valuation | Segment | Comps Used (List) | Valuation Metric | Comp Benchmark (Median/Mean) | Applied Multiple | Estimated Value ($M) | Sources/Notes (Justify Premium/Discount) | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [Segment 1 Name] | | | | | | | | [Segment 2 Name] | | | | | | | | [Non-Core/Other Assets] | [Method] | | | | | | | Adjustments | N/A | N/A | N/A | N/A | | [e.g., Unallocated Corp. Overhead] | | Total SOTP EV | | | | | | | | Fair Value Per Share (SOTP) | | | | | [$X.XX] | |
+
+TABLE G: Scenarios & Expected Value | Case | Probability (%) | Fair Value Per Share ($) | Key Drivers (One Line Summary) | | :--- | :--- | :--- | :--- | | Bear | | | | | Base | | | | | Bull | | | | | Expected Value | 100% | [$X.XX] | |
+
+TABLE H: Reverse DCF (Market Expectations Check) | Input Price ($) | Implied Rev CAGR (10yr) (%) | Implied Steady State Op Margin (%) | Comment on Plausibility | | :--- | :--- | :--- | :--- | | [Market Price] | | | |
+
+TABLE I: Valuation Summary & Bands
+| Valuation | Weight (%) | Fair Value Per Share ($) || :--- | :--- | :--- || DCF Value | | || SOTP Value | | || **Blended Fair Value** | **100%** | **[$X.XX]** || *Bands* | *Price Range ($)* | Rationale || Undervalued (Buy Zone) | | Requires X% Margin of Safety || Fairly Valued | | || Overvalued (Sell Zone) | | |
+
+INVESTMENT THESIS (Concise Summary):
+  - Recommendation: [Buy/Hold/Sell]
+  - Price Target: [{CURRENCY} X.XX] (Based on Blended Fair Value)
+  - Thesis Summary: (3-5 sentences: Core driver of value, most significant risk, reason for mispricing if any).
+  - Key Catalysts: (1-3 upcoming events that could cause the stock to re-rate).
+
+Notes & Methodology Details:
+  - [Justification for blended valuation weights.]
+  - [Explanation of any "Unknown" data points or data conflicts.]
+  - [Detailed methodology and inputs used for capitalizing operating leases (Discount rate used, commitment schedule extracted).]
+  - [Justification for the selected Terminal Growth Rate and source.]

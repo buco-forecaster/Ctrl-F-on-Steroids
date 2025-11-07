@@ -1,0 +1,109 @@
+@DEFAULT_FOLLOWUPS
+RESULT: |
+    Prompt: Your response must be only a single fenced code block containing a JSON object.
+    Strict Output Requirements:
+      1) Do not include any text, explanations, or comments before or after the JSON code block.
+      2) The root must be a single JSON object.
+      3) The top-level keys for this object must be strings representing a soccer match, using standard 3-letter team codes in the format HOME_vs_AWAY (e.g., AVL_vs_MCI).
+      4) The value for each top-level key must be an object that follows the exact structure shown in the example below.
+
+    Example JSON Structure:
+    "AVL_vs_MCI": {
+        "League": "Premier League",
+        "Home Team": "Aston Villa",
+        "Away Team": "Manchester City",
+        "Market": "Home win and BTTS",
+        "Final Probability": "45%",
+        "Fair Odds": "2.22",
+        "Given Odd": "2.50",
+        "EV": "11.0%",
+        "Value Detected?": "Yes"
+    }
+---
+
+@GLOBALS
+MATCH_DATE: 07 November 2025
+---
+
+@SEGMENT
+ANALYSIS_ID: paris_fc_vs_rennes
+LEAGUE: Ligue 1
+HOME: Paris FC
+AWAY: Rennes
+GIVEN_ODD: 3.95
+MARKET: {HOME} team win AND Both Teams to Score (BTTS)
+DATA_CUTOFF: {CURRENT_DATETIME}
+---
+
+@CONTENT
+ROLE: Act as an expert quantitative sports analyst specializing in football probability modeling. Your task is to determine the fair probability of the specified {MARKET} using a multi-source,
+      statistically calibrated approach, and assess if the {GIVEN_ODD} represents a Value Bet.
+OBJECTIVE: Execute a 5-Phase analysis combining proprietary statistical modeling and synthesized external predictions to calculate the Expected Value (EV) of the provided bet.
+
+CONSTRAINTS:
+1. Prioritize data sources exactly as listed.
+2. Do not fabricate data. If critical data (e.g., xG) is unavailable, state this limitation in the notes and rely on goal averages and Elo ratings as a fallback.
+3. The final output must strictly adhere to the specified Markdown format.
+
+PHASE 1: DATA ACQUISITION STRATEGY
+Search and extract the following data points.
+
+1.  **Advanced Metrics (Primary: Fbref; Secondary: WhoScored/Understat):**
+    *   Season-to-date xG For/Against (must include Home/Away splits).
+    *   Last 6 Matches xG For/Against.
+2.  **Recent Form & Trends (Primary: SoccerSTATS):**
+    *   Last 6 matches results (Home/Away specific).
+    *   BTTS percentages (Season and Last 6 matches).
+3.  **Team Strength Baseline (Primary: Clubelo):**
+    *   Current Elo ratings for {HOME} and {AWAY}.
+4.  **League Averages (Primary: Fbref or SoccerSTATS):**
+    *   Average home goals (Avg_H) and average away goals (Avg_A) for the current {LEAGUE} season.
+5.  **Contextual Factors (Primary: Flashscore, Reputable Sports News):**
+    *   Verified/Predicted Lineups (within 48 hours of {DATA_CUTOFF}).
+    *   Key injuries/suspensions (Assess impact on attacking/defensive capabilities).
+6.  **External Prediction Models:**
+    *   Sources: Forebet, SoccerStats (predictions), Betensured, EaglePredict, FootballWhispers.
+
+PHASE 2: INTERNAL STATISTICAL MODELING
+Calculate the proprietary probability based on acquired data.
+
+1.  **Calculate Attack/Defense Strengths (AS/DS):**
+    *   Determine AS and DS for both teams, prioritizing xG data over raw goals.
+    *   AS = Team's Average xG For / League Average xG.
+    *   DS = Team's Average xG Against / League Average xG.
+    *   Apply weighting to the strengths: 65% Season data, 35% Last 6 matches data.
+2.  **Calculate Goal Expectancy (GE):**
+    *   HOME GE = {HOME} AS * {AWAY} DS * League Avg_H.
+    *   AWAY GE = {AWAY} AS * {HOME} DS * League Avg_A.
+3.  **Qualitative Adjustments:**
+    *   Apply evidence-based adjustments (max +/- 10%) to the GE based on critical contextual factors (e.g., absence of a key striker reduces GE). Document the rationale clearly.
+4.  **Probability Calculation (Poisson Distribution):**
+    *   Using the final adjusted GE as the lambda (λ) for a Poisson distribution, calculate the probability matrix of every realistic scoreline (e.g., 0-0 up to 6-6).
+    *   **INTERNAL PROBABILITY:** Sum the probabilities of all scorelines that satisfy the {MARKET} criteria. (e.g., for "Home Win AND BTTS", sum P(2-1), P(3-1), P(3-2), etc.).
+
+PHASE 3: EXTERNAL PREDICTION BENCHMARKING
+1.  **Data Extraction:** Extract the predicted probabilities from the sources listed in Phase 1. bullet 6.
+2.  **Market Probability Estimation:** If the exact {MARKET} probability is not provided, estimate it. Acknowledge that this estimation assumes independence between the events.
+3.  **Synthesis:** Calculate the average probability for the {MARKET} across all external sources (EXTERNAL CONSENSUS).
+
+PHASE 4: FINAL PROBABILITY SYNTHESIS
+Combine the Internal Model probability and the External Benchmark.
+
+1.  **Weighted Average:** Calculate the FINAL PROBABILITY using a weighted approach:
+    *   Internal Model (Phase 2): 50% Weight
+    *   External Consensus (Phase 3): 50% Weight
+
+PHASE 5: VALUATION
+Calculate Fair Odds and Expected Value (EV).
+
+1.  **Fair Odds:** 1 / FINAL PROBABILITY. (Zero Margin).
+2.  **Expected Value (EV)%:** ((FINAL PROBABILITY * {GIVEN_ODD}) - 1) * 100.
+
+OUTPUT FORMAT
+Return exactly the following markdown table and the analysis notes.
+
+**Bet Valuation Summary**
+
+| League   | Home Team | Away Team | Market   | Final Probability | Fair Odds | Given Odd   |    EV    | Value Detected? |
+|----------|-----------|-----------|----------|-------------------|-----------|-------------|----------|-----------------|
+| {LEAGUE} |  {HOME}   |  {AWAY}   | {MARKET} |       [Value]%    |  [Value]  | {GIVEN_ODD} | [Value]% |    [Yes/No]     |

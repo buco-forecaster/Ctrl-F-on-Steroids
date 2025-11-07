@@ -1,0 +1,37 @@
+# Leagues - weekend fixtures
+# ------------------------------------------------------------------------------
+
+@SEGMENT
+ANALYSIS_ID: soccer_premier_league
+LEAGUE: Premier League
+---
+@SEGMENT
+ANALYSIS_ID: soccer_la_liga
+LEAGUE: La Liga
+---
+@SEGMENT
+ANALYSIS_ID: soccer_serie_a
+LEAGUE: Serie A
+---
+@SEGMENT
+ANALYSIS_ID: soccer_bundesliga
+LEAGUE: Bundesliga
+---
+@SEGMENT
+ANALYSIS_ID: soccer_ligue_1
+LEAGUE: Ligue 1
+
+# World competitions
+# ------------------------------------------------------------------------------
+
+@SEGMENT
+ANALYSIS_ID: soccer_champions_league
+LEAGUE: Champions League
+---
+@SEGMENT
+ANALYSIS_ID: soccer_europa_league
+LEAGUE: Europa League
+---
+@SEGMENT
+ANALYSIS_ID: soccer_conference_league
+LEAGUE: Conference League

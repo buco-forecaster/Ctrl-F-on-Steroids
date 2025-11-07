@@ -15,7 +15,13 @@ class LocalRepository:
         ANSWERS_DIR.mkdir(exist_ok=True, parents=True)
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{ts}-{_slug(result.query)}.json"
+
+        # analysis_id is now mandatory
+        if not result.analysis_id or not result.analysis_id.strip():
+            raise ValueError("analysis_id is required for artifact storage and cannot be empty.")
+        base_name = result.analysis_id.strip().replace(" ", "_")
+
+        filename = f"{base_name}.json"
         path = ANSWERS_DIR / filename
 
         payload = {
@@ -23,5 +29,6 @@ class LocalRepository:
             "query": result.query,
             "pdf_path": result.pdf_path,
             "followups": result.followups,
+            "analysis_id": result.analysis_id,
         }
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

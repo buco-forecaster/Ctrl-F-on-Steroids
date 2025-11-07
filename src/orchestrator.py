@@ -28,8 +28,8 @@ class Orchestrator:
                 results = []
 
                 for seg in segments:
-                    followups = seg["followups"] or (defaults or [])
-                    req = QueryRequest(query=seg["query"], followups=followups)
+                    followups = seg["followups"] or (defaults if defaults else {})
+                    req = QueryRequest(query=seg["query"], followups=followups, analysis_id=seg["analysis_id"])
                     res = self.strategy.run(client, req)
                     self.repository.save_result(res)
                     results.append(res)

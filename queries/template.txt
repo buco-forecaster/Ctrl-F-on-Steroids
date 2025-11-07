@@ -1,0 +1,22 @@
+@DEFAULT_FOLLOWUPS
+COMPANY: |
+    Return the exact legal company name for ticker {TICKER} as of {VALUATION_DATE}. Output only the name or Unknown.
+ANALYSIS_DATE: Return the analysis date as YYYYMMDD. Output only the 8 digit date.
+FAIR_VALUE_USD: Return the fair value per share in USD. Output only a number with optional decimals.
+---
+@SEGMENT
+ANALYSIS_ID: Google
+COMPANY: Alphabet Inc. (Google)
+---
+@SEGMENT
+ANALYSIS_ID: Amazon
+COMPANY: Amazon
+---
+@CONTENT
+Analyse the company in detail.
+  1. Obtain and summarise the current financial results.
+  2. Compare valuations with historical values and competition.
+  3. Identify the main growth drivers and risks.
+  4. Determine the fair value of the stock (DCF and multiples).
+  5. Propose price ranges when the stock is undervalued, fairly valued, and overvalued.
+Provide output in tables and end with a short summary recommendation.

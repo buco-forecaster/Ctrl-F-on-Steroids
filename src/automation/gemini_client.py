@@ -11,20 +11,16 @@ class GeminiClient:
     def __init__(self, page: Page):
         self.page = page
 
-    # --- Client Methods START --- #
     def new_chat(self) -> None:
         new_chat_btn = self.page.locator('[aria-label="New chat"]')
         new_chat_btn.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
-        new_chat_btn.click()
-        time.sleep(2)
+        new_chat_btn.click(timeout=DEFAULT_TIMEOUT_MS)
+        time.sleep(3)
 
-    def ask_followups(self, followups: List[str]) -> Dict[str, str]:
-        answers = {}
-        for q in followups or []:
-            answers[q] = self.ask_and_capture(q)
-        return answers
+    def execute_deep_research(self, query: str, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for PDF export and cannot be empty.")
 
-    def execute_deep_research(self, query: str) -> Optional[str]:
         start_btn = self.page.get_by_role("button", name=L.RE_DEEP_RESEARCH, exact=True)
         start_btn.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
         start_btn.click()
@@ -42,9 +38,15 @@ class GeminiClient:
 
         self.wait_for_answer(L.RE_COMPLETED, state="visible")
 
-        return self.export_pdf(query=query)
-        self.page.goto("https://gemini.google.com/app/da23344c7a5e47f7")
-        return None
+        return self.export_pdf(query=query, analysis_id=analysis_id)
+        self.page.goto("https://gemini.google.com/app/01270b5a267d9b5a")
+        time.sleep(3)
+
+    def ask_followups(self, followups: Dict[str, str]) -> Dict[str, str]:
+        answers = {}
+        for key, question in (followups or {}).items():
+            answers[key] = self.ask_and_capture(question)
+        return answers
 
     # --- Client Methods END --- #
 
@@ -63,7 +65,7 @@ class GeminiClient:
     def wait_for_answer(self, text, state) -> None:
         just_sec = self.page.get_by_text(text).last
         just_sec.wait_for(state=state, timeout=DEFAULT_DEEP_RESEARCH_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(3)
 
     def ask_and_capture(self, q: str) -> str:
         box = self.page.get_by_role("textbox")
@@ -76,44 +78,49 @@ class GeminiClient:
         time.sleep(5)
 
         return self.extract_last_assistant_answer()
+    def export_pdf(self, query: str, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for PDF export and cannot be empty.")
 
-    def export_pdf(self, query: Optional[str] = None) -> str:
         share_btn = self.page.get_by_role("button").filter(has_text=L.RE_SHARE_EXPORT).last
         share_btn.click(timeout=DEFAULT_TIMEOUT_MS)
 
         with self.page.expect_popup(timeout=DEFAULT_TIMEOUT_MS) as popup_info:
             menuitem = self.page.get_by_role("menuitem", name=L.RE_EXPORT_TO_DOCS)
             menuitem.click(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(5)
+        time.sleep(10)
 
         doc_page = popup_info.value
         file_menu = doc_page.get_by_role("menuitem", name="File")
         file_menu.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
         file_menu.click(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(1.5)
 
         download_menu = doc_page.get_by_role("menuitem", name="Download")
         download_menu.hover(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(1.5)
 
         pdf_item = doc_page.get_by_role("menuitem", name="PDF Document")
         with doc_page.expect_download(timeout=DEFAULT_TIMEOUT_MS) as dl_info:
             pdf_item.click(timeout=DEFAULT_TIMEOUT_MS)
 
         download = dl_info.value
-        out_path = self.save_as_pdf(query, download)
+        out_path = self.save_as_pdf(query, download, analysis_id=analysis_id)
         doc_page.close()
 
         return out_path
 
     @staticmethod
-    def save_as_pdf(query, downloaded_file) -> str:
+    def save_as_pdf(query: str, downloaded_file, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for filename and cannot be empty.")
+
         out_dir = "outputs"
         Path(out_dir).mkdir(exist_ok=True, parents=True)
 
-        safe_query = (query or "export").strip().replace(" ", "_")[:34]
+        base_name = analysis_id.strip().replace(" ", "_")[:64]
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_path = f"{out_dir}/{timestamp}-{safe_query}.pdf"
+        out_path = f"{out_dir}/{base_name}.pdf"
 
         downloaded_file.save_as(out_path)
         return out_path

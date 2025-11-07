@@ -1,0 +1,192 @@
+@DEFAULT_FOLLOWUPS
+ODDS_SUMMARY_TABLE: |
+    Return exactly one plain Markdown table. Do not use a code block. Show only the requested summary (tickets) tables.
+    No text before or after. No extra blocks. No explanations or comments. Do not include backticks. Output only the table so it can be parsed and stored as a Python string.
+RESULT: |
+    Prompt: Your response must be only a single fenced code block containing a valid JSON object.
+
+    Strict Output Requirements:
+      1) Do not include any text, explanations, or comments before or after the JSON code block.
+      2) The entire response must be enclosed in a single json code block.
+
+    JSON Structure Requirements:
+      1) The root is a single JSON object.
+      2) The top-level keys are unique Ticket IDs (e.g., a 5-character uppercase alphanumeric string like 314DS).
+      3) The value for each Ticket ID key must be an object containing exactly two keys:
+         - fixtures
+         - ticket_summary
+      4) The value of fixtures is an object where:
+         - Keys are strings representing a soccer match using 3-letter team codes (e.g., AVL_vs_MCI).
+         - Values are objects containing the specific match details (League, Match, Market, etc.), as shown in the example.
+      5) The value of ticket_summary is an object containing the summary data (Total Accumulator Odds, etc.), as shown in the example.
+
+    Example JSON Structure:
+    {
+      "314DS": {
+        "fixtures": {
+          "AVL_vs_MCI": {
+            "League": "Premier League",
+            "Match": "Aston Villa vs Manchester City",
+            "Market": "Home win and BTTS",
+            "Selection": "Aston Villa",
+            "Bookmaker": "Fortuna SK",
+            "Decimal Odds": "2.50",
+            "Fair Implied Probability": "40.0%",
+            "Model Probability": "50.0%",
+            "Edge": "10.0%",
+            "ROI": "25.0%",
+            "Margin": "5.0%",
+            "Confidence (0-10)": 9
+          },
+          "CRY_vs_MUN": {
+            "League": "Premier League",
+            "Match": "Crystal Palace vs Manchester United",
+            "Market": "Home win and BTTS",
+            "Selection": "Crystal Palace",
+            "Bookmaker": "Fortuna SK",
+            "Decimal Odds": "2.50",
+            "Fair Implied Probability": "40.0%",
+            "Model Probability": "50.0%",
+            "Edge": "10.0%",
+            "ROI": "25.0%",
+            "Margin": "5.0%",
+            "Confidence (0-10)": 9
+          }
+        },
+        "ticket_summary": {
+          "Total Accumulator Odds (Odds_Ticket)": "6.25",
+          "Probability of Win (P(Win_Ticket))": "25.0%",
+          "Boosted ROI (ROI_Ticket_Boosted)": "50.0%"
+        }
+      },
+      "A9B2E": {
+        "fixtures": {
+          "LIV_vs_EVE": {
+            "League": "Premier League",
+            "Match": "Liverpool vs Everton",
+            "Market": "O/U 2.5",
+            "Selection": "Over 2.5",
+            "Bookmaker": "Bet365",
+            "Decimal Odds": "1.80",
+            "Fair Implied Probability": "55.0%",
+            "Model Probability": "60.0%",
+            "Edge": "5.0%",
+            "ROI (Standard)": "9.1%",
+            "Margin": "3.0%",
+            "Confidence (0-10)": 7
+          }
+        },
+        "ticket_summary": {
+          "Total Accumulator Odds (Odds_Ticket)": "1.80",
+          "Probability of Win (P(Win_Ticket))": "60.0%",
+          "Boosted ROI (ROI_Ticket_Boosted)": "12.0%"
+        }
+      }
+    }
+---
+
+@GLOBALS
+MATCH_DATE: 08 November 2025
+---
+
+@SEGMENT
+ANALYSIS_ID: ako_5_matches_30_percent_bonus
+LEAGUES: Premier League, Bundesliga
+NUMBER_OF_TICKETS: 3
+ODDS_RANGE_PER_FIXTURE: 1.30 - 1.80
+MAX_TICKET_ODD: 13.00
+BONUS_STRUCTURE:
+    Event: Fortuna Generous Weekends Bonus: 30% Odds Boost
+    Conditions:
+        - Bet type must be an accumulator (AKO).
+        - The accumulator bet must contain at least 5 selections.
+        - Each of these 5 selections must have minimum odds of 1.3.
+    Indicators:
+        - If the bet qualifies, the ticket will display "EXTRA 30 %".
+        - If the bet qualifies, the potential winnings will be increased by 30%.
+---
+
+@CONTENT
+TITLE: DeepSearch Optimized Accumulator (AKO) Strategy Protocol
+ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist. Your objective is to construct accumulator bets (tickets) that maximize the probability of winning while ensuring long-term positive Return on Investment (ROI), adhering strictly to the defined constraints and bonus structure. Utilize advanced statistical modeling, multi-source data synthesis (internal models + external prediction sites), and rigorous data verification.
+
+- PRIMARY OBJECTIVE: Maximize the Probability of Winning the entire accumulator (P(Win_Ticket)). This is critical for sustainability.
+- SECONDARY OBJECTIVE: Maximize the Boosted ROI (ROI_Ticket_Boosted).
+- ROI REQUIREMENT: ROI_Ticket_Boosted MUST be positive (>0%).
+- ODDS LIMITS: Total odds must not exceed MAX_TICKET_ODD and individual fixtures must be within ODDS_RANGE_PER_FIXTURE.
+- ODDS SOURCE HIERARCHY:
+    - Primary: Fortuna SK (ifortuna.sk).
+    - Secondary: OddsPortal (https://www.oddsportal.com/) which mirrors ifortuna.cz; ifortuna.cz odds are equivalent to ifortuna.sk.
+    - Tertiary: Niké (nike.sk) or flashscore.com which mirror ifortuna odds.
+    - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
+- ALLOWED MARKETS: 1X2 (Full Time Result), Over/Under (Total Goals - all lines, e.g., 1.5, 2.5), Both Teams To Score (BTTS).
+- FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps, Draw No Bet, Player Props.
+
+PHASE 1: DATA SYNTHESIS AND ACQUISITION
+1) SCOPE: Identify all matches within the defined LEAGUES playing on MATCH_DATE. List kickoff times in UTC.
+2) ODDS & MARGIN: Retrieve current odds from the ODDS SOURCE HIERARCHY for all ALLOWED MARKETS. Record the UTC timestamp. Calculate the Bookmaker Margin (Vigorish).
+3) CORE METRICS (Fbref Primary, SoccerSTATS/Flashscore Secondary):
+   - npxG (Non-Penalty Expected Goals) and npxGA (Allowed) - Season-to-date and rolling last 6 matches.
+   - Set-Piece effectiveness and vulnerabilities.
+   - Shooting Efficiency (Goals minus xG).
+4) BASELINE STRENGTH: Acquire current Elo ratings and recent trends (last 30 days) from clubelo.com.
+5) SITUATIONAL CONTEXT: Acquire injury/suspension data, schedule congestion (days of rest), and tactical analysis (WhoScored).
+6) EXTERNAL PREDICTION SYNTHESIS: Scrape and integrate model probabilities from reputable prediction sites (e.g., Forebet, SoccerStats, Betensured, EaglePredict, FootballWhispers).
+
+PHASE 2: PROBABILITY MODELING AND CALIBRATION
+1) MODEL IMPLEMENTATION: Utilize an Ensemble Model blending:
+   - A customized Poisson or Negative Binomial model based on adjusted Attack/Defense strengths (derived from xG/xGA and recent form).
+   - An Elo-based probability calculation.
+2) FEATURE ADJUSTMENTS: Quantify the impact of key injuries/suspensions on team npxG/npxGA expectations. Adjust for home/away splits.
+3) SYNTHESIS & CALIBRATION: Combine the internal Ensemble Model outputs with the External Prediction data (Phase 1.6) using a weighted average approach. Calibrate against league averages (e.g., home-field advantage).
+4) MODEL PROBABILITY: Generate the final 'Model Probability' (True Probability) for all outcomes in ALLOWED MARKETS.
+
+PHASE 3: SELECTION POOL GENERATION
+1) INDIVIDUAL ASSESSMENT: For every potential selection:
+   - Calculate Fair Implied Probability (Bookmaker odds with margin removed, rescaled to 100%).
+   - Calculate Edge = Model Probability - Fair Implied Probability.
+   - Calculate ROI (Standard) = (Model Probability * Decimal Odds) - 1.
+2) CONFIDENCE SCORING (0-10): Assign a score based on:
+   - Data robustness (Quality/consensus of xG, ELO, and External Predictions). (5 points)
+   - Model certainty and agreement between ensemble components. (3 points)
+   - Certainty regarding situational factors (injuries/lineups confirmed). (2 points)
+3) FILTERING: Create the "Selection Pool" by including ONLY selections that meet:
+   - Odds are strictly within the {ODDS_RANGE_PER_FIXTURE}.
+   - Market is an ALLOWED MARKET.
+   (Note: Do not filter by positive Edge/ROI here; this is handled by the AKO optimizer using the Boosted ROI).
+
+PHASE 4: ACCUMULATOR OPTIMIZATION (CRITICAL STEP)
+This phase uses combinatorial optimization to maximize P(Win_Ticket).
+1) COMBINATORICS: Generate all possible accumulator combinations from the Selection Pool that meet the BONUS_STRUCTURE requirements ({Min_Fixtures}).
+2) TICKET METRICS CALCULATION: For each combination, calculate:
+   - Odds_Ticket: The product of the Decimal Odds of all selections.
+   - P(Win_Ticket): The product of the Model Probabilities of all selections. (PRIMARY OPTIMIZATION FACTOR)
+   - ROI_Ticket_Boosted: (P(Win_Ticket) * Odds_Ticket * Bonus_Multiplier) - 1. (SECONDARY OPTIMIZATION FACTOR)
+3) FINAL SELECTION:
+   - Filter out any tickets where Odds_Ticket > {MAX_TICKET_ODD}.
+   - Filter out any tickets where Odds_Ticket < {Min_Total_Odds}.
+   - Filter out any tickets where ROI_Ticket_Boosted <= 0.
+   - Rank the remaining tickets. The primary sort key is P(Win_Ticket) (Descending). The secondary sort key is ROI_Ticket_Boosted (Descending).
+   - Select the top {NUMBER_OF_TICKETS} results.
+   - 1 match can be shared across different tickets, but each ticket must be unique in its full selection set.
+
+PHASE 5: OUTPUT GENERATION
+1) FORMATTING: Generate the output as specified below. Sort selections within each ticket by Confidence (descending).
+
+Present the results as separate tables for each ticket. Include summary statistics below each table.
+
+Ticket 1:
+| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability | Model Probability | Edge   | ROI (Standard) | Margin | Confidence (0-10) |
+|--------|-------|------------------|-----------|---------------|--------------|--------------------------|-------------------|--------|----------------|--------|-------------------|
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
+
+**Ticket 1 Summary:**
+*   Total Accumulator Odds (Odds_Ticket): [X.XX]
+*   Probability of Win (P(Win_Ticket)): [XX.X%]
+*   Boosted ROI (ROI_Ticket_Boosted): [XX.X%]
+
+[Repeat Table and Summary for Ticket 2 to NUMBER_OF_TICKETS]

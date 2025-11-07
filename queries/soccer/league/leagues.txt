@@ -1,0 +1,134 @@
+@DEFAULT_FOLLOWUPS
+ODDS_SUMMARY_TABLE: |
+  Return exactly one plain Markdown table.
+  Do not use a code block.
+  Show only the requested summary table.
+  No text before or after. No extra blocks.
+  No explanations or comments. Do not include backticks.
+  Output only the table so it can be parsed and stored as a Python string.
+RESULT: |
+    Prompt: Your response must be only a single fenced code block containing a JSON object.
+    Strict Output Requirements:
+      1) Do not include any text, explanations, or comments before or after the JSON code block.
+      2) The root must be a single JSON object.
+      3) The top-level keys for this object must be strings representing a soccer match, using standard 3-letter team codes in the format HOME_vs_AWAY (e.g., AVL_vs_MCI).
+      4) The value for each top-level key must be an object that follows the exact structure shown in the example below.
+
+    Example JSON Structure:
+    "AVL_vs_MCI": {
+        "League": "Premier League",
+        "Home Team": "Aston Villa",
+        "Away Team": "Manchester City",
+        "Market": "Home win and BTTS",
+        "Final Probability": "45%",
+        "Fair Odds": "2.22",
+        "Given Odd": "2.50",
+        "EV": "11.0%",
+        "Value Detected?": "Yes"
+    },
+    "SUN_vs_EVE": {
+        "League": "Premier League",
+        "Home Team": "Sunderland",
+        "Away Team": "Everton",
+        "Market": "1X2",
+        "Final Probability": "40%",
+        "Fair Odds": "2.50",
+        "Given Odd": "2.80",
+        "EV": "12.0%",
+        "Value Detected?": "Yes"
+    },
+---
+@GLOBALS
+MATCH_DATE: 07 November 2025
+ODDS_RANGE: 1.30 to 7.00
+
+---
+@SEGMENT
+ANALYSIS_ID: premier_league
+LEAGUE: Premier League
+---
+@SEGMENT
+ANALYSIS_ID: la_liga
+LEAGUE: La Liga
+---
+@SEGMENT
+ANALYSIS_ID: serie_a
+LEAGUE: Serie A
+---
+@SEGMENT
+ANALYSIS_ID: bundesliga
+LEAGUE: Bundesliga
+---
+@SEGMENT
+ANALYSIS_ID: ligue_1
+LEAGUE: Ligue 1
+
+---
+@CONTENT
+TITLE: DeepSearch Quantitative Value Bet Identification Protocol
+ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializing in football betting markets. Utilize advanced statistical modeling, multi-source data synthesis, and rigorous DeepSearch verification to identify statistically significant Value Bets with positive Expected Value (+EV).
+INCLUSION: Only matches confirmed to be played on {MATCH_DATE}.
+
+CORE CONSTRAINTS:
+- ODDS SOURCE:
+  - Primary: Fortuna SK (ifortuna.sk).
+  - Secondary: OddsPortal (https://www.oddsportal.com/) which mirrors ifortuna.cz; ifortuna.cz odds are equivalent to ifortuna.sk.
+  - Tertiary: Niké (nike.sk) or flashscore.com which mirror ifortuna odds.
+  - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
+- ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
+- ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5), Both Teams To Score (BTTS).
+- FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps.
+- CITATION MANDATE: All critical data points (stats, odds, key news) MUST be cited with a direct URL.
+
+EXECUTION PROTOCOL:
+PHASE 1: MARKET INTAKE AND DATA ACQUISITION
+1) Identify all matches within the SCOPE. List kickoff times in UTC.
+2) Market Data: Retrieve current odds from the ODDS SOURCE hierarchy for all ALLOWED MARKETS.
+   - Crucial: Record the exact UTC timestamp of odds retrieval and the precise source (Fortuna, OddsPortal/ifortuna.cz mirror, or Fallback).
+   - Calculate the Bookmaker Margin (Vigorish) for each market. (Margin = (1/Odds1 + 1/Odds2 + ... + 1/OddsN) - 1). Prioritize analysis on markets with the lowest margin.
+3) Advanced Metrics (Season-to-date & Last 6 matches): Acquire and verify data from Fbref (Primary) and Flashscore (Secondary):
+   - Non-Penalty Expected Goals (npxG) and Non-Penalty Expected Goals Allowed (npxGA).
+   - Set-Piece xG and xGA.
+   - Shot-Creating Actions (SCA) or Progressive Carries/Passes (as proxies for offensive threat).
+   - Shooting Efficiency (Goals minus xG).
+4) Baseline Strength: Acquire current Elo ratings and recent trends (last 30 days) from clubelo.com.
+5) Situational Data: Acquire injury/suspension data (Flashscore, official club announcements or similar pages), schedule context (days of rest), and tactical styles (WhoScored).
+6) External Prediction Synthesis: Scrape and integrate model probabilities from reputable prediction sites (e.g., Forebet, SoccerStats, Betensured, EaglePredict, FootballWhispers).
+
+PHASE 2: FEATURE ENGINEERING AND SIGNAL GENERATION
+1) Form Analysis: Calculate weighted form metrics, emphasizing home/away splits using SoccerSTATS and Fbref.
+2) xG Differentials: Calculate rolling npxG differentials (npxG - npxGA) over the last 6 matches. Identify teams significantly over- or under-performing their underlying metrics (candidates for regression).
+3) Qualitative Impact Quantification:
+   - Quantify the impact of key injuries/suspensions on team npxG and npxGA based on player contribution data (Fbref). (e.g., "Absence of Player X reduces team npxG expectancy by 0.2 based on their season contribution").
+4) H2H Context: Analyze the last 3 H2H meetings (Fbref match logs), focusing on tactical setups and xG flow, rather than just results.
+
+PHASE 3: PROBABILITY MODELING AND CALIBRATION
+1) Model Implementation: Utilize an Ensemble Model blending:
+   - A customized Poisson or Negative Binomial distribution based on adjusted Attack/Defense strengths (derived from npxG/npxGA, recent form, and qualitative adjustments from Phase 2).
+   - An Elo-based probability calculation.
+2) Calibration: Calibrate the model outputs against the current LEAGUE season's averages (e.g., average goals per game, home-field advantage coefficient, draw frequency).
+3) Model Probability: Generate the 'Model Probability' (True Probability) for all outcomes in the 1X2 and relevant O/U markets.
+4) Synthesis & Calibration: Combine the internal Ensemble Model outputs with the External Prediction data using a weighted average approach.
+
+PHASE 4: VALUE IDENTIFICATION AND PRIORITIZATION
+1) Fair Implied Probability: Calculate the bookmaker's implied probability (1/Odds). Remove the margin calculated in Phase 1 to determine the 'Fair Implied Probability' (probabilities rescaled to sum to 100%).
+2) Edge Calculation: Edge = Model Probability - Fair Implied Probability.
+3) ROI Calculation: ROI (Expected Return on Investment) = (Model Probability * Decimal Odds) - 1.
+4) Selection Filter:
+   - Include selections that meet Core Constraints (markets, sources, {ODDS_RANGE}).
+   - Do not restrict to “best” picks only; consider all qualifying selections across allowed markets for each match.
+
+PHASE 5: OUTPUT GENERATION (FINAL TABLE MUST INCLUDE ALL QUALIFYING BETS)
+1) External Cross-Check: Compare the generated Value Bets against analysis from reputable analytical sources (Betarena, Covers). Note significant disagreements in the Evidence column.
+2) Mandatory Output Rules:
+   - The final table MUST contain ALL selections that passed the filtering stage (not only bests).
+   - Columns MUST include ROI and Confidence (0–10).
+   - Sort the table by Confidence (descending), then ROI (descending).
+3) Output: Generate the final table.
+
+OUTPUT FORMAT:
+Return Markdown table.
+
+| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability | Model Probability | Edge   | ROI (Standard) | Margin | Confidence (0-10) |
+|--------|-------|------------------|-----------|---------------|--------------|--------------------------|-------------------|--------|----------------|--------|-------------------|
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                  | [XX.X%]           | [X.X%] | [X.X%]         | [X.X%] | [0-10]            |
