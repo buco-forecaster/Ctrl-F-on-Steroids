@@ -51,7 +51,7 @@ CORE CONSTRAINTS:
 - ODDS SOURCE:
   - Primary: Fortuna SK (ifortuna.sk).
   - Secondary: OddsPortal (https://www.oddsportal.com/) which mirrors ifortuna.cz; ifortuna.cz odds are equivalent to ifortuna.sk.
-  - Tertiary: Niké (nike.sk)
+  - Tertiary: Niké (nike.sk) or flashscore.com which mirror ifortuna odds.
   - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
 - ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
 - ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5), Both Teams To Score (BTTS).
