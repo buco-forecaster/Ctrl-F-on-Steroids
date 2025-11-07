@@ -14,12 +14,12 @@ class GeminiClient:
     def new_chat(self) -> None:
         new_chat_btn = self.page.locator('[aria-label="New chat"]')
         new_chat_btn.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
-        new_chat_btn.click()
+        new_chat_btn.click(timeout=DEFAULT_TIMEOUT_MS)
         time.sleep(3)
 
-    def execute_deep_research(self, query: str, output_name: str) -> str:
-        if not output_name or not output_name.strip():
-            raise ValueError("output_name is required for PDF export and cannot be empty.")
+    def execute_deep_research(self, query: str, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for PDF export and cannot be empty.")
 
         start_btn = self.page.get_by_role("button", name=L.RE_DEEP_RESEARCH, exact=True)
         start_btn.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
@@ -38,12 +38,14 @@ class GeminiClient:
 
         self.wait_for_answer(L.RE_COMPLETED, state="visible")
 
-        return self.export_pdf(query=query, output_name=output_name)
+        return self.export_pdf(query=query, analysis_id=analysis_id)
+        self.page.goto("https://gemini.google.com/app/01270b5a267d9b5a")
+        time.sleep(3)
 
-    def ask_followups(self, followups: List[str]) -> Dict[str, str]:
+    def ask_followups(self, followups: Dict[str, str]) -> Dict[str, str]:
         answers = {}
-        for q in followups or []:
-            answers[q] = self.ask_and_capture(q)
+        for key, question in (followups or {}).items():
+            answers[key] = self.ask_and_capture(question)
         return answers
 
     # --- Client Methods END --- #
@@ -76,9 +78,9 @@ class GeminiClient:
         time.sleep(5)
 
         return self.extract_last_assistant_answer()
-    def export_pdf(self, query: str, output_name: str) -> str:
-        if not output_name or not output_name.strip():
-            raise ValueError("output_name is required for PDF export and cannot be empty.")
+    def export_pdf(self, query: str, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for PDF export and cannot be empty.")
 
         share_btn = self.page.get_by_role("button").filter(has_text=L.RE_SHARE_EXPORT).last
         share_btn.click(timeout=DEFAULT_TIMEOUT_MS)
@@ -103,20 +105,20 @@ class GeminiClient:
             pdf_item.click(timeout=DEFAULT_TIMEOUT_MS)
 
         download = dl_info.value
-        out_path = self.save_as_pdf(query, download, output_name=output_name)
+        out_path = self.save_as_pdf(query, download, analysis_id=analysis_id)
         doc_page.close()
 
         return out_path
 
     @staticmethod
-    def save_as_pdf(query: str, downloaded_file, output_name: str) -> str:
-        if not output_name or not output_name.strip():
-            raise ValueError("output_name is required for filename and cannot be empty.")
+    def save_as_pdf(query: str, downloaded_file, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for filename and cannot be empty.")
 
         out_dir = "outputs"
         Path(out_dir).mkdir(exist_ok=True, parents=True)
 
-        base_name = output_name.strip().replace(" ", "_")[:64]
+        base_name = analysis_id.strip().replace(" ", "_")[:64]
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         out_path = f"{out_dir}/{base_name}.pdf"
 

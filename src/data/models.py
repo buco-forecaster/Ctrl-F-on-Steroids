@@ -4,8 +4,8 @@ from typing import Dict, List, Optional
 @dataclass
 class QueryRequest:
     query: str
-    followups: List[str]
-    output_name: str  # Now required
+    followups: Dict[str, str]
+    analysis_id: str  # Now required
 
 @dataclass
 class AnalysisResult:
@@ -13,4 +13,4 @@ class AnalysisResult:
     query: str
     followups: Dict[str, str]
     pdf_path: str  # Now required
-    output_name: str  # Now required
+    analysis_id: str  # Now required

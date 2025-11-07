@@ -1,41 +1,22 @@
----DEFAULT-FOLLOWUP---
-!KEY=COMPANY
-Return the exact legal company name for ticker {TICKER} as of {VALUATION_DATE}. Output only the name or Unknown.
----FOLLOWUP_SEPARATOR---
-!KEY=ANALYSIS_DATE
-Return the analysis date as YYYYMMDD. Output only the 8 digit date.
----FOLLOWUP_SEPARATOR---
-!KEY=FAIR_VALUE
-Return the fair value per share in {CURRENCY}. Output only a number with optional decimals.
----FOLLOWUP_SEPARATOR---
-!KEY=PRICE_BANDS
-Return four numbers in this order as CSV without spaces buy_max sell_min. Output only numbers comma separated. Example format 225,290.
----FOLLOWUP_SEPARATOR---
-!KEY=CURRENT_PRICE
-Return the official close price in {CURRENCY} on {VALUATION_DATE}. Output only a number with optional decimals.
----FOLLOWUP_SEPARATOR---
-!KEY=RECOMMENDATION
-Based on fair value vs current price return exactly one word from this set Buy Hold Sell. Output only that word.
----FOLLOWUP_SEPARATOR---
-!KEY=KEY_RISKS
-Return exactly three risk tags as lowercase snake case separated by commas no spaces. If unknown return Unknown. Example format regulation,ai_costs,competition.
----FOLLOWUP_SEPARATOR---
-!KEY=KEY_CATALYSTS
-Return exactly three catalyst tags as lowercase snake case separated by commas no spaces. If unknown return Unknown. Example format cloud_growth,ai_monetization,youtube.
----FOLLOWUP_SEPARATOR---
-!KEY=SHORT_SUMMARY
-Short summary. Return a single concise line 6 to 12 words ascii only no punctuation. If unknown return Unknown.
-
----QUERY_SEPARATOR---
----VARIABLES_SEPARATOR---
-!ANALYSIS_ID=stock_novo_nordisk
-VARIABLES
-  - COMPANY: Novo Nordisk A/S
-  - TICKER: NVO
-  - CURRENCY: DKK
-  - VALUATION_DATE: November 4, 2025
-
----CONTENT_TEMPLATE---
+@DEFAULT_FOLLOWUPS
+COMPANY: Return the exact legal company name for ticker {TICKER} as of {VALUATION_DATE}. Output only the name or Unknown.
+ANALYSIS_DATE: Return the analysis date as YYYYMMDD. Output only the 8 digit date.
+FAIR_VALUE_USD: Return the fair value per share in USD. Output only a number with optional decimals.
+PRICE_BANDS_USD: Return four numbers in this order as CSV without spaces buy_max hold_min hold_max sell_min. Output only numbers comma separated. Example format 225,225,290,290.
+CURRENT_PRICE_USD: Return the official close price in USD on {VALUATION_DATE}. Output only a number with optional decimals.
+RECOMMENDATION: Based on fair value vs current price return exactly one word from this set Buy Hold Sell. Output only that word.
+KEY_RISKS: Return exactly three risk tags as lowercase snake case separated by commas no spaces. If unknown return Unknown. Example format regulation,ai_costs,competition.
+KEY_CATALYSTS: Return exactly three catalyst tags as lowercase snake case separated by commas no spaces. If unknown return Unknown. Example format cloud_growth,ai_monetization,youtube.
+SHORT_SUMMARY: Short summary. Return a single concise line 6 to 12 words ascii only no punctuation. If unknown return Unknown.
+---
+@SEGMENT
+ANALYSIS_ID: stock_amazon
+Company: Amazon
+Ticker: AMZN
+Currency: USD
+Valuation Date: November 1, 2025
+---
+@CONTENT
 2. TITLE: DeepSearch Equity Valuation: {COMPANY} (TICKER: {TICKER}) - DCF, SOTP, and Scenario Analysis
 
 3. ROLE AND OBJECTIVE
@@ -130,4 +111,3 @@ Notes & Methodology Details:
   - [Explanation of any "Unknown" data points or data conflicts.]
   - [Detailed methodology and inputs used for capitalizing operating leases (Discount rate used, commitment schedule extracted).]
   - [Justification for the selected Terminal Growth Rate and source.]
----END_CONTENT_TEMPLATE---

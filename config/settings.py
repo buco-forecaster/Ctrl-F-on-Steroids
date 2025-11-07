@@ -23,6 +23,14 @@ DEFAULT_DEEP_RESEARCH_TIMEOUT_MS = 15 * 60_000
 OUTPUTS_DIR = Path("outputs")
 ANSWERS_DIR = OUTPUTS_DIR / "answers"
 
+# MongoDB configuration
+MONGO_URI = "mongodb://localhost:27017"
+MONGO_DB_NAME = "gemini"
+STOCKS_COLLECTION = "stock_results"
+SOCCER_COLLECTION = "soccer_results"
+MONGO_CONN_TIMEOUT_MS = 5000
+MONGO_SOCKET_TIMEOUT_MS = 5000
+
 # New template and variable mode delimiters
 VARIABLES_SEPARATOR = '---VARIABLES_SEPARATOR---'
 CONTENT_TEMPLATE_BEGIN = '---CONTENT_TEMPLATE---'

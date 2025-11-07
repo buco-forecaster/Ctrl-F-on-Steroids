@@ -1,27 +1,53 @@
----DEFAULT-FOLLOWUP---
-Return exactly one fenced code block (copy paste block). Show only the requested summary table inside the block. No text before or after. No extra blocks. No explanations or comments.
-Do not include backticks inside the block. Output only this code block so I can parse and store it as a string in Python.
+@DEFAULT_FOLLOWUPS
+ODDS_SUMMARY_TABLE: |
+  Return exactly one plain Markdown table.
+  Do not use a code block.
+  Show only the requested summary table.
+  No text before or after. No extra blocks.
+  No explanations or comments. Do not include backticks.
+  Output only the table so it can be parsed and stored as a Python string.
 
----QUERY_SEPARATOR---
----VARIABLES_SEPARATOR---
-!OUTPUT_NAME=soccer_bundesliga_2025-11-02
-VARIABLES:
-- LEAGUE: Bundesliga
-- MATCH_DATE: 02 November 2025
+---
+@GLOBALS
+Timezone: Europe/Prague
 
----QUERY_SEPARATOR---
----VARIABLES_SEPARATOR---
-!OUTPUT_NAME=soccer_ligue_1_2025-11-02
-VARIABLES:
-- LEAGUE: Ligue 1
-- MATCH_DATE: 02 November 2025
+---
+@SEGMENT
+ANALYSIS_ID: soccer_premier_league
+League: Premier League
+Match Date: 03 November 2025
 
----CONTENT_TEMPLATE---
+---
+@SEGMENT
+ANALYSIS_ID: soccer_la_liga
+League: La Liga
+Match Date: 03 November 2025
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_serie_a
+League: Serie A
+Match Date: 03 November 2025
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_bundesliga
+League: Bundesliga
+Match Date: 02 November 2025
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_ligue_1
+League: Ligue 1
+Match Date: 02 November 2025
+
+---
+@CONTENT
 TITLE: DeepSearch Quantitative Value Bet Identification Protocol
 
 ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializing in football betting markets. Utilize advanced statistical modeling, multi-source data synthesis, and rigorous DeepSearch verification to identify statistically significant Value Bets with positive Expected Value (+EV).
 
-INCLUSION: Only matches confirmed to be played on MATCH_DATE.
+INCLUSION: Only matches confirmed to be played on {Match Date}.
 
 CORE CONSTRAINTS:
 - ODDS SOURCE: Primary: Fortuna SK (fortuna.sk). If unavailable, use a reputable Slovak fallback (e.g., Niké, Tipsport SK) and label it as Fallback: [Name].
@@ -73,7 +99,7 @@ PHASE 5: OUTPUT GENERATION
 1) External Cross-Check: Compare the generated Value Bets against analysis from reputable analytical sources (Betarena, Covers). Note significant disagreements in the Evidence column.
 2) Output: Generate the final table.
 
-**OUTPUT FORMAT:**
+OUTPUT FORMAT:
 Return Markdown table.
 
 | League | Match | Kickoff UTC | Market | Selection | Bookmaker | Decimal Odds | Fair Implied Probability (%) | Model Probability (%) | Edge (%) | ROI (%) | Margin (%) | Confidence (0-10) | Sources | Evidence |
@@ -83,6 +109,3 @@ Return Markdown table.
 COLUMN RULES:
 - Percentages (Fair Implied, Model, Edge, ROI, Margin) must be rounded to one decimal place (e.g., 5.1%).
 - Decimal Odds must have exactly two decimal places (e.g., 2.00).
-- Sources: Must contain short, numbered inline links (e.g., [1](url) [2](url)) referencing direct URLs used for critical data.
-- Evidence: A concise, data-driven justification (max 200 characters) referencing key signals and including the odds retrieval timestamp. Example: "HOME npxG differential +0.5 over L8 [1]; AWAY key defender (Player X) injured [2]; Model favors Over. Odds retrieved 01 Nov 23:30 UTC."
----END_CONTENT_TEMPLATE---

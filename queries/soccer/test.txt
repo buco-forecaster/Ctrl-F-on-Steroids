@@ -1,11 +1,92 @@
----QUERY_SEPARATOR---
-VARIABLES:
-- LEAGUE: Premier League
-- HOME: Liverpool
-- AWAY: Aston Villa
-- MATCH_DATE: 01 November 2025
+@DEFAULT_FOLLOWUPS
+ODDS_SUMMARY_TABLE: |
+    Return exactly one plain Markdown table.
+    Do not use a code block.
+    Show only the table. No text before or after.
+    No extra blocks. No explanations or comments.
+    Do not include backticks.
+    Output only the table so it can be parsed and stored as a Python string.
+FIXTURE_LIST: |
+    Prompt: Your response must be only a single fenced code block containing a JSON object.
+    Strict Output Requirements:
+      1) Do not include any text, explanations, or comments before or after the JSON code block.
+      2) The root must be a single JSON object.
+      3) The top-level keys for this object must be strings representing a soccer match, using standard 3-letter team codes in the format HOME_vs_AWAY (e.g., AVL_vs_MCI).
+      4) The value for each top-level key must be an object that follows the exact structure shown in the example below.
 
-TITLE: Statistically Calibrated Deep-Search Analysis: Liverpool vs Aston Villa (01 Nov 2025) - 1X2 and Over/Under Probabilities
+    Example JSON Structure:
+    {
+      "AVL_vs_MCI": {
+        "Match": "Aston Villa vs Mancheter City",
+        "Market": "O/U 2.5",
+        "Selection": "Under 2.5",
+        "Bookmaker": "Fortuna SK",
+        "Decimal Odds": "2.35",
+        "Fair Implied Probability": "41.9%",
+        "Model Probability": "55.0%",
+        "Edge": "13.1%",
+        "ROI": "29.3%",
+        "Margin": "7.3%",
+        "Confidence": 10
+      },
+      "LIV_vs_EVE": {
+        "Match": "Liverpool vs Everton",
+        "Market": "1X2",
+        "Selection": "Liverpool",
+        "Bookmaker": "Bet365",
+        "Decimal Odds": "1.50",
+        "Fair Implied Probability": "65.0%",
+        "Model Probability": "70.0%",
+        "Edge": "5.0%",
+        "ROI": "7.7%",
+        "Margin": "2.5%",
+        "Confidence": 8
+      }
+    }
+---
+@GLOBALS
+MATCH_DATE: 03 November 2025
+DATA_CUTOFF_UTC: 2025-11-03T12:00:00Z
+Timezone: Europe/Prague
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_sunderland_everton
+League: Premier League
+Home: Sunderland
+Away: Everton
+FOLLOWUPS:
+  ODDS_SUMMARY_TABLE: |
+    Return exactly one plain Markdown table with:
+    - 1X2 calibrated probabilities and fair odds
+    - O/U 2.5 and 3.5 calibrated probabilities and fair odds
+    - Current Fortuna odds for both markets
+    Do not include any text before or after the table.
+  CUSTOM_MARKETS: Provide Asian Handicap -0.25 fair odds for home team only.
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_sassuolo_genoa
+League: Serie A
+Home: Sassuolo
+Away: Genoa
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_lazio_cagliari
+League: Serie A
+Home: Lazio
+Away: Cagliari
+FOLLOWUPS:
+  NOTES_BLOCK: |
+    Output a short Notes block (3-5 lines):
+    - Conflicts and chosen resolution
+    - Injury news confidence
+    - Timestamp (UTC) when odds were read
+
+---
+@CONTENT
+TITLE: Statistically Calibrated Deep-Search Analysis: [HOME] vs [AWAY] ({MATCH_DATE}) - 1X2 and Over/Under Probabilities
 
 ROLE: Act as an expert sports analyst and data scientist for football betting. Use advanced statistical methods and DeepSearch web research to identify Value Bets. Follow all constraints and return only the requested output.
 
@@ -55,17 +136,3 @@ VALIDATION CHECKLIST (SELF-CORRECTION):
 - Do the probabilities in Table 1 sum to 100%?
 - Do the Over/Under probabilities for each threshold (2.5 and 3.5) sum to 100%?
 - Are Fair Odds calculated correctly as 1/probability with two decimals and zero margin?
-
-
----QUERY_SEPARATOR---
-League: Premier League
-Match analysis: Brighton (home) vs Leeds (away)
-Date: November 1, 2025
-(1) Determine the current form of both teams (home and away) over roughly their last 10 matches, including results, goals scored and conceded in the Premier League and other competitions.
-(2) Analyze the head-to-head (H2H) history, focusing on recent meetings and results achieved at the home team’s stadium.
-(3) Review the latest news for both teams, especially information about injured or suspended key players and the expected starting lineups.
-(4) Find and compare detailed team statistics for the current season, such as expected goals (xG), expected goals against (xGA), and performance in home and away matches.
-(5) Assess the likely tactical formations and playing styles of both teams and analyze how they might interact on the field.
-(6) Based on the synthesis of all collected data (form, H2H, squad condition, statistics, tactics), produce a comprehensive evaluation and calculate percentage probabilities for each outcome: home win, draw, away win.
-(7) Convert the calculated percentage probabilities into fair betting odds for each of the three outcomes.
-(8) In the analysis, also take into account betting and prediction sites that forecast match results.

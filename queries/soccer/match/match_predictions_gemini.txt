@@ -1,0 +1,86 @@
+@DEFAULT_FOLLOWUPS
+ODDS_SUMMARY_TABLE: |
+  Return exactly one plain Markdown table.
+  Do not use a code block.
+  Show only the requested summary table.
+  No text before or after. No extra blocks.
+  No explanations or comments. Do not include backticks.
+  Output only the table so it can be parsed and stored as a Python string.
+
+---
+@GLOBALS
+MATCH_DATE: 07 November 2025
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_{HOME}.lower()_{AWAY}.lower()
+LEAGUE: La Liga
+HOME: Elche
+AWAY: Villarreal
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_{HOME}.lower()_{AWAY}.lower()
+LEAGUE: Ligue 1
+HOME: Paris FC
+AWAY: Rennes
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_{HOME}.lower()_{AWAY}.lower()
+LEAGUE: Bundesliga
+HOME: Werder Bremen
+AWAY: Wolfsburg
+
+---
+@CONTENT
+TITLE: Statistically Calibrated Deep-Search Analysis: [HOME] vs [AWAY] ({MATCH_DATE}) - 1X2 and Over/Under Probabilities
+
+ROLE: Act as an expert sports analyst and data scientist for football betting. Use advanced statistical methods and DeepSearch web research to identify Value Bets. Follow all constraints and return only the requested output.
+
+OBJECTIVE: Synthesize quantitative and qualitative data from multiple verified sources to produce the most accurate, statistically calibrated pre-match analysis for the specified fixture. The analysis must result in calculated probabilities for 1X2 and Over/Under markets, compared against primary bookmaker odds.
+
+DATA ACQUISITION STRATEGY & PRIORITIZATION: Execute a comprehensive data search using the following prioritized sources.
+1) Expected Goals (xG) and Advanced Stats (Season-to-date): Fbref (Primary for xG, xGA, SCA), WhoScored (Secondary).
+2) Recent Form & Scoring Trends (Last 6 matches): SoccerSTATS (Home/Away splits, scoring times), Fbref.
+3) Team Strength Rating: Clubelo (Current Elo ratings).
+4) Tactical Analysis & Predicted Lineups: WhoScored (styles, formations). Verify predicted lineups and team news with reputable sports news sources updated within 48 hours of the DATA CUTOFF.
+5) Injury and Suspension Data: Flashscore, official club announcements or similar pages.
+6) Market Odds: Fortuna SK (Primary source for 1X2, O/U 2.5, O/U 3.5).
+
+CORE METHODOLOGY (INTERNAL GUIDANCE): The analysis must internally utilize these principles to justify the output numbers:
+1) Data Synthesis: Integrate advanced metrics (xG differentials), baseline strength (Elo), recent performance trends (weighing the last 6 matches appropriately), and qualitative factors (critical injuries, tactical matchups, H2H context).
+2) Goal Expectancy Modeling: Utilize a recognized statistical model (e.g., customized Poisson distribution, Negative Binomial, or an ensemble approach blending Elo and xG). Calculate HOME and AWAY Attack/Defense Strengths based on respective xG scored and xG conceded, adjusted for home/away splits.
+3) Calibration: Calibrate the model outputs against the current LEAGUE season's average scoring rates and home-field advantage statistics.
+4) Adjustments: Apply evidence-based adjustments based on the qualitative factors synthesized in Step 1 (e.g., quantifying the impact of key missing players on team xG/xGA).
+
+STRICT CONSTRAINTS & RULES:
+1) Verification and Citation: Every non-trivial claim, statistic, injury report, and odds value MUST be cited with a direct, working URL in the Citations block.
+2) No Fabrication: Do not fabricate data. If a specific data point cannot be verified, display "Unknown" in the table and explain the missing information in the Notes section.
+3) Conflict Resolution: If sources disagree (e.g., different xG values), prioritize the sources as listed in the Data Acquisition Strategy (e.g., Fbref for xG). Document the conflict and the chosen resolution in the Notes.
+4) Odds Source and Fallback: Fetch current odds from Fortuna SK as close to the DATA CUTOFF time as possible. If Fortuna SK is unavailable for any requested market, use a reputable Slovak fallback bookmaker (e.g., Tipsport SK). Clearly state the source used and the exact timestamp (UTC) of retrieval in the Notes.
+
+TASKS:
+1) Compute calibrated outcome probabilities for Home Win, Draw, and Away Win (must sum to 100%).
+2) Convert these probabilities to Fair Odds (1 / probability), displayed as decimal odds with exactly two decimals and zero margin (no vigorish).
+3) Fetch current Fortuna SK decimal odds for the 1X2 market.
+4) Compute calibrated probabilities for Over 2.5, Under 2.5, Over 3.5, and Under 3.5.
+5) Convert these probabilities to Fair Odds (two decimals, zero margin).
+6) Fetch current Fortuna SK decimal odds for the O/U 2.5 and O/U 3.5 markets.
+
+OUTPUT FORMAT: Return exactly the following two markdown tables, followed by the Notes and Citations sections. Do not include any preamble, introduction, summary, or filler text. Use whole numbers for percentages (e.g., 50%) and two decimals for odds (e.g., 2.00).
+
+TABLE 1: 1X2 | League | Home Team | Away Team | Home Win (%) | Draw (%) | Away Win (%) | Fair Odds Home | Fair Odds Draw | Fair Odds Away | Fortuna Odds Home | Fortuna Odds Draw | Fortuna Odds Away | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] | [Value] |
+
+TABLE 2: Over/Under 2.5 and 3.5 | League | Home Team | Away Team | Market | Probability (%) | Fair Odds | Fortuna Odds | | :--- | :--- | :--- | :--- | :--- | :--- | :--- | | [LEAGUE] | [HOME] | [AWAY] | Over 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 2.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Over 3.5 | [Value] | [Value] | [Value] | | [LEAGUE] | [HOME] | [AWAY] | Under 3.5 | [Value] | [Value] | [Value] |
+
+Notes:
+- [Briefly detail the specific methodology used, e.g., "Ensemble model (xG-based Poisson + Elo) calibrated to league average of X.XX goals/game."]
+- [List any data conflicts and resolutions.]
+- [List any missing data (Unknowns) and their potential impact on uncertainty.]
+- [Confirm the odds source used (Fortuna or Fallback) and the timestamp (UTC) when odds were retrieved.]
+
+VALIDATION CHECKLIST (SELF-CORRECTION):
+- Do the probabilities in Table 1 sum to 100%?
+- Do the Over/Under probabilities for each threshold (2.5 and 3.5) sum to 100%?
+- Are Fair Odds calculated correctly as 1/probability with two decimals and zero margin?

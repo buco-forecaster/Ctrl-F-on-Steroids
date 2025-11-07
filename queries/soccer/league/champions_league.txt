@@ -1,0 +1,91 @@
+@DEFAULT_FOLLOWUPS
+ODDS_SUMMARY_TABLE: |
+  Return exactly one plain Markdown table.
+  Do not use a code block.
+  Show only the requested summary table.
+  No text before or after. No extra blocks.
+  No explanations or comments. Do not include backticks.
+  Output only the table so it can be parsed and stored as a Python string.
+
+---
+@GLOBALS
+MATCH_DATE: 05 November 2025
+ODDS_RANGE: 1.30 to 7.00
+
+---
+@SEGMENT
+ANALYSIS_ID: soccer_champions_league
+League: Champions League
+
+---
+@CONTENT
+TITLE: DeepSearch Quantitative Value Bet Identification Protocol
+
+ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializing in football betting markets. Utilize advanced statistical modeling, multi-source data synthesis, and rigorous DeepSearch verification to identify statistically significant Value Bets with positive Expected Value (+EV).
+
+INCLUSION: Only matches confirmed to be played on {MATCH_DATE}.
+
+CORE CONSTRAINTS:
+- ODDS SOURCE: Always retrieve odds from Fortuna SK (fortuna.sk) first. If Fortuna odds are not accessible, get them from Flashscore (it mirrors Fortuna odds). If neither source works, use a reliable Slovak bookmaker such as Niké or Tipsport SK and clearly label the source as Fallback: [Bookmaker Name].
+- ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
+- ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5).
+- FORBIDDEN MARKETS: Both Teams To Score (BTTS), Corners, Cards, Asian Handicaps.
+- CITATION MANDATE: All critical data points (stats, odds, key news) MUST be cited with a direct URL.
+
+EXECUTION PROTOCOL:
+PHASE 1: MARKET INTAKE AND DATA ACQUISITION
+1) Identify all matches within the SCOPE. List kickoff times in UTC.
+2) Market Data: Retrieve current odds from the ODDS SOURCE for all ALLOWED MARKETS.
+   - Crucial: Record the exact UTC timestamp of odds retrieval.
+   - Calculate the Bookmaker Margin (Vigorish) for each market. (Margin = (1/Odds1 + 1/Odds2 + ... + 1/OddsN) - 1). Prioritize analysis on markets with the lowest margin.
+3) Advanced Metrics (Season-to-date & Last 8 matches): Acquire and verify data from Fbref (Primary) and Flashscore (Secondary):
+   - Non-Penalty Expected Goals (npxG) and Non-Penalty Expected Goals Allowed (npxGA).
+   - Set-Piece xG and xGA.
+   - Shot-Creating Actions (SCA) or Progressive Carries/Passes (as proxies for offensive threat).
+   - Shooting Efficiency (Goals minus xG).
+4) Baseline Strength: Acquire current Elo ratings and recent trends (last 30 days) from clubelo.com.
+5) Situational Data: Acquire injury/suspension data (Flashscore, official club announcements or similar pages), schedule context (days of rest), and tactical styles (WhoScored).
+
+PHASE 2: FEATURE ENGINEERING AND SIGNAL GENERATION
+1) Form Analysis: Calculate weighted form metrics, emphasizing home/away splits using SoccerSTATS and Fbref.
+2) xG Differentials: Calculate rolling npxG differentials (npxG - npxGA) over the last 8 matches. Identify teams significantly over- or under-performing their underlying metrics (candidates for regression).
+3) Qualitative Impact Quantification:
+   - Quantify the impact of key injuries/suspensions on team npxG and npxGA based on player contribution data (Fbref). (e.g., "Absence of Player X reduces team npxG expectancy by 0.2 based on their season contribution").
+4) H2H Context: Analyze the last 3 H2H meetings (Fbref match logs), focusing on tactical setups and xG flow, rather than just results.
+
+PHASE 3: PROBABILITY MODELING AND CALIBRATION
+1) Model Implementation: Utilize an Ensemble Model blending:
+   - A customized Poisson or Negative Binomial distribution based on adjusted Attack/Defense strengths (derived from npxG/npxGA, recent form, and qualitative adjustments from Phase 2).
+   - An Elo-based probability calculation.
+2) Calibration: Calibrate the model outputs against the current LEAGUE season's averages (e.g., average goals per game, home-field advantage coefficient, draw frequency).
+3) Model Probability: Generate the 'Model Probability' (True Probability) for all outcomes in the 1X2 and relevant O/U markets.
+
+PHASE 4: VALUE IDENTIFICATION AND PRIORITIZATION
+1) Fair Implied Probability: Calculate the bookmaker's implied probability (1/Odds). Remove the margin calculated in Phase 1 to determine the 'Fair Implied Probability' (probabilities rescaled to sum to 100%).
+2) Edge Calculation: Edge = Model Probability - Fair Implied Probability.
+3) ROI Calculation: ROI (Expected Return on Investment) = (Model Probability * Decimal Odds) - 1.
+4) Confidence Scoring (0-10): Assign a score based on:
+   - Data robustness (Quality of xG/Elo data, sample size). (4 points)
+   - Model certainty and agreement between ensemble components. (3 points)
+   - Certainty regarding situational factors (injuries/lineups confirmed). (3 points)
+
+PHASE 5: OUTPUT GENERATION
+1) Filtering: Compile all selections analyzed in Phase 4 that strictly meet the Core Constraints (Odds {ODDS_RANGE}, Market 1X2 or O/U, specified Bookmaker).
+2) Confidence Score (0-10): Rate each compiled selection based on:
+  - The robustness of the supporting data (xG, ELO).
+  - The consensus between external sources and your own analysis.
+  - The magnitude of the expected ROI and Edge (higher score for higher positive value).
+  - Certainty regarding situational factors (injuries).
+3) Mandatory Output Format: You MUST return a final summary table containing ALL selections that passed the filtering stage (Constraints met). Do not omit any qualifying results from this table, regardless of whether the ROI is positive or negative. Sort the table descending by Confidence (0-10). Use the exact column names and format below.
+
+OUTPUT FORMAT:
+The table must contain the following columns:
+League, Match, Market, Selection, Bookmaker, Decimal Odds, Implied Probability (%), Model Probability (%), Edge (%), ROI (%), Margin (%), Confidence (0–10).
+
+TABLE FORMAT:
+| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability (%) | Model Probability (%) | Edge (%) | ROI (%) | Margin (%) | Confidence (0-10) |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               |  [X.X%]  | [X.X%]  | [X.X%]     | [0-10]            |
+
+COLUMN RULES:
+- Percentages (Fair Implied, Model, Edge, ROI, Margin) must be rounded to one decimal place (e.g., 5.1%).
+- Decimal Odds must have exactly two decimal places (e.g., 2.00).

@@ -16,12 +16,12 @@ class LocalRepository:
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        # output_name is now mandatory
-        if not result.output_name or not result.output_name.strip():
-            raise ValueError("output_name is required for artifact storage and cannot be empty.")
-        base_name = result.output_name.strip().replace(" ", "_")[:64]
+        # analysis_id is now mandatory
+        if not result.analysis_id or not result.analysis_id.strip():
+            raise ValueError("analysis_id is required for artifact storage and cannot be empty.")
+        base_name = result.analysis_id.strip().replace(" ", "_")
 
-        filename = f"{ts}-{base_name}.json"
+        filename = f"{base_name}.json"
         path = ANSWERS_DIR / filename
 
         payload = {
@@ -29,6 +29,6 @@ class LocalRepository:
             "query": result.query,
             "pdf_path": result.pdf_path,
             "followups": result.followups,
-            "output_name": result.output_name,
+            "analysis_id": result.analysis_id,
         }
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -4,6 +4,7 @@ from linecache import clearcache
 from config.settings import DEFAULT_TIMEOUT_MS
 from src.automation.gemini_client import GeminiClient
 from src.data.models import QueryRequest, AnalysisResult
+from src.data.mongo_repository import StockMongoRepository
 
 class StockStrategy:
     def run(self, client: GeminiClient, request: QueryRequest) -> AnalysisResult:
@@ -12,7 +13,7 @@ class StockStrategy:
         try:
             while attempts < max_attempts:
                 attempts += 1
-                pdf_path = client.execute_deep_research(request.query, output_name=request.output_name)
+                pdf_path = client.execute_deep_research(request.query, analysis_id=request.analysis_id)
                 break
         except Exception as e:
             print(f"Error during deep research execution: {e}")
@@ -36,10 +37,14 @@ class StockStrategy:
 
         client.new_chat()
 
-        return AnalysisResult(
+        result = AnalysisResult(
             timestamp=datetime.now().isoformat(timespec="seconds"),
             query=request.query,
-            followups=followups,
+            followups=followups,  # {key: answer}
             pdf_path=pdf_path,
-            output_name=request.output_name,
+            analysis_id=request.analysis_id,
         )
+
+        # Store result also in MongoDB (stock_results collection)
+        StockMongoRepository().save_result(result)
+        return result
