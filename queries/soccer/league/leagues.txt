@@ -35,12 +35,14 @@ League: Ligue 1
 ---
 @CONTENT
 TITLE: DeepSearch Quantitative Value Bet Identification Protocol
+
 ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist specializing in football betting markets. Utilize advanced statistical modeling, multi-source data synthesis, and rigorous DeepSearch verification to identify statistically significant Value Bets with positive Expected Value (+EV).
-INCLUSION: Only matches confirmed to be played on {Match Date}.
+
+INCLUSION: Only matches confirmed to be played on {MATCH_DATE}.
 
 CORE CONSTRAINTS:
-- ODDS SOURCE: Primary: Fortuna SK (fortuna.sk). If unavailable, use a reputable Slovak fallback (e.g., Niké, Tipsport SK) and label it as Fallback: [Name].
-- ODDS RANGE: Decimal odds strictly between 1.30 and 7.00.
+- ODDS SOURCE: Always retrieve odds from Fortuna SK (fortuna.sk) first. If Fortuna odds are not accessible, get them from Flashscore (it mirrors Fortuna odds). If neither source works, use a reliable Slovak bookmaker such as Niké or Tipsport SK and clearly label the source as Fallback: [Bookmaker Name].
+- ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
 - ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5).
 - FORBIDDEN MARKETS: Both Teams To Score (BTTS), Corners, Cards, Asian Handicaps.
 - CITATION MANDATE: All critical data points (stats, odds, key news) MUST be cited with a direct URL.
@@ -77,23 +79,28 @@ PHASE 4: VALUE IDENTIFICATION AND PRIORITIZATION
 1) Fair Implied Probability: Calculate the bookmaker's implied probability (1/Odds). Remove the margin calculated in Phase 1 to determine the 'Fair Implied Probability' (probabilities rescaled to sum to 100%).
 2) Edge Calculation: Edge = Model Probability - Fair Implied Probability.
 3) ROI Calculation: ROI (Expected Return on Investment) = (Model Probability * Decimal Odds) - 1.
-4) Selection: Filter for bets where Edge > 0 and all CORE CONSTRAINTS are met.
-5) Confidence Scoring (0-10): Assign a score based on:
+4) Confidence Scoring (0-10): Assign a score based on:
    - Data robustness (Quality of xG/Elo data, sample size). (4 points)
    - Model certainty and agreement between ensemble components. (3 points)
    - Certainty regarding situational factors (injuries/lineups confirmed). (3 points)
-6) Prioritization: Sort final selections by Confidence (descending), then ROI (descending). When ROI is similar, prioritize higher Model Probability and lower Margin.
 
 PHASE 5: OUTPUT GENERATION
-1) External Cross-Check: Compare the generated Value Bets against analysis from reputable analytical sources (Betarena, Covers). Note significant disagreements in the Evidence column.
-2) Output: Generate the final table.
+1) Filtering: Compile all selections analyzed in Phase 4 that strictly meet the Core Constraints (Odds {ODDS_RANGE}, Market 1X2 or O/U, specified Bookmaker).
+2) Confidence Score (0-10): Rate each compiled selection based on:
+  - The robustness of the supporting data (xG, ELO).
+  - The consensus between external sources and your own analysis.
+  - The magnitude of the expected ROI and Edge (higher score for higher positive value).
+  - Certainty regarding situational factors (injuries).
+3) Mandatory Output Format: You MUST return a final summary table containing ALL selections that passed the filtering stage (Constraints met). Do not omit any qualifying results from this table,
+   regardless of whether the ROI is positive or negative. Sort the table descending by Confidence (0-10). Use the exact column names and format below.
 
 OUTPUT FORMAT:
-Return Markdown table.
+The table must contain the following columns:
+League, Match, Market, Selection, Bookmaker, Decimal Odds, Implied Probability (%), Model Probability (%), Edge (%), ROI (%), Margin (%), Confidence (0–10).
 
-| League | Match | Kickoff UTC | Market | Selection | Bookmaker | Decimal Odds | Fair Implied Probability (%) | Model Probability (%) | Edge (%) | ROI (%) | Margin (%) | Confidence (0-10) | Sources | Evidence |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| [Text] | [Text] | [HH:MM] | [1X2 or O/U X.5] | [Pick] | [Source Name] | [X.XX] | [XX.X%] | [XX.X%] | [X.X%] | [X.X%] | [X.X%] | [0-10] | [Links] | [Text] |
+TABLE FORMAT:
+| League | Match | Market           | Selection | Bookmaker     | Decimal Odds | Fair Implied Probability (%) | Model Probability (%) | Edge (%) | ROI (%) | Margin (%) | Confidence (0-10) |
+| [Text] | [Text]| [1X2 or O/U X.5] | [Pick]    | [Source Name] | [X.XX]       | [XX.X%]                      | [XX.X%]               |  [X.X%]  | [X.X%]  | [X.X%]     | [0-10]            |
 
 COLUMN RULES:
 - Percentages (Fair Implied, Model, Edge, ROI, Margin) must be rounded to one decimal place (e.g., 5.1%).

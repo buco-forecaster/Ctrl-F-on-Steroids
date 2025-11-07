@@ -13,21 +13,21 @@ MATCH_DATE: 07 November 2025
 
 ---
 @SEGMENT
-ANALYSIS_ID: soccer_{HOME}.lower()_{AWAY}.lower()
+ANALYSIS_ID: elche_vs_villarreal
 LEAGUE: La Liga
 HOME: Elche
 AWAY: Villarreal
 
 ---
 @SEGMENT
-ANALYSIS_ID: soccer_{HOME}.lower()_{AWAY}.lower()
+ANALYSIS_ID: paris_fc_vs_rennes
 LEAGUE: Ligue 1
 HOME: Paris FC
 AWAY: Rennes
 
 ---
 @SEGMENT
-ANALYSIS_ID: soccer_{HOME}.lower()_{AWAY}.lower()
+ANALYSIS_ID: werder_bremen_vs_wolfsburg
 LEAGUE: Bundesliga
 HOME: Werder Bremen
 AWAY: Wolfsburg
