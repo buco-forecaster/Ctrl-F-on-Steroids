@@ -1,3 +1,20 @@
+@META
+COLLECTION: match_of_the_day
+DOMAIN: soccer
+VERSION: 2.1
+
+@GLOBALS
+MATCH_DATE: 07 November 2025
+
+@SEGMENT
+ANALYSIS_ID: paris_fc_vs_rennes
+LEAGUE: Ligue 1
+HOME: Paris FC
+AWAY: Rennes
+GIVEN_ODD: 3.95
+MARKET: {HOME} team win AND Both Teams to Score (BTTS)
+DATA_CUTOFF: {CURRENT_DATETIME}
+
 @DEFAULT_FOLLOWUPS
 RESULT: |
     Prompt: Your response must be only a single fenced code block containing a JSON object.
@@ -19,21 +36,6 @@ RESULT: |
         "EV": "11.0%",
         "Value Detected?": "Yes"
     }
----
-
-@GLOBALS
-MATCH_DATE: 07 November 2025
----
-
-@SEGMENT
-ANALYSIS_ID: paris_fc_vs_rennes
-LEAGUE: Ligue 1
-HOME: Paris FC
-AWAY: Rennes
-GIVEN_ODD: 3.95
-MARKET: {HOME} team win AND Both Teams to Score (BTTS)
-DATA_CUTOFF: {CURRENT_DATETIME}
----
 
 @CONTENT
 ROLE: Act as an expert quantitative sports analyst specializing in football probability modeling. Your task is to determine the fair probability of the specified {MARKET} using a multi-source,

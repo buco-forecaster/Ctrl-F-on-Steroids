@@ -1,3 +1,17 @@
+@META
+COLLECTION: match
+DOMAIN: soccer
+VERSION: 2.1
+
+@GLOBALS
+MATCH_DATE: 07 November 2025
+
+@SEGMENT
+ANALYSIS_ID: elche_vs_villarreal
+LEAGUE: La Liga
+HOME: Elche
+AWAY: Villarreal
+
 @DEFAULT_FOLLOWUPS
 ODDS_SUMMARY_TABLE: |
   Return exactly one plain Markdown table.
@@ -26,18 +40,6 @@ RESULT: |
         "EV": "11.0%",
         "Value Detected?": "Yes"
     }
----
-
-@GLOBALS
-MATCH_DATE: 07 November 2025
----
-
-@SEGMENT
-ANALYSIS_ID: elche_vs_villarreal
-LEAGUE: La Liga
-HOME: Elche
-AWAY: Villarreal
----
 
 @CONTENT
 TITLE: Statistically Calibrated Deep-Search Analysis: [HOME] vs [AWAY] ({MATCH_DATE}) - 1X2, Over/Under and BTTS Value Bet Identification
@@ -53,6 +55,7 @@ CORE CONSTRAINTS:
   - Secondary: OddsPortal (https://www.oddsportal.com/) which mirrors ifortuna.cz; ifortuna.cz odds are equivalent to ifortuna.sk.
   - Tertiary: Niké (nike.sk) or flashscore.com which mirror ifortuna odds.
   - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
+  - DON'T fabricate (simulate) odds data.
 - ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
 - ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5), Both Teams To Score (BTTS).
 - FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps.
