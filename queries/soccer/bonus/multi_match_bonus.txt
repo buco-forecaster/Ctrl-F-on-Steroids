@@ -2,9 +2,11 @@
 COLLECTION: multi_match_bonus
 DOMAIN: soccer
 VERSION: 2.1
+---
 
 @GLOBALS
 MATCH_DATE: 03 November 2025
+---
 
 @SEGMENT
 - LEAGUES: La Liga, Bundesliga
@@ -20,6 +22,7 @@ MATCH_DATE: 03 November 2025
     Indicators:
       - If the bet qualifies, the ticket will display "EXTRA 30 %".
       - If the bet qualifies, the potential winnings will be increased by 30%.
+---
 
 @DEFAULT_FOLLOWUPS
 ODDS_SUMMARY_TABLE: |
@@ -106,6 +109,7 @@ RESULT: |
         }
       }
     }
+---
 
 @CONTENT
 TITLE: DeepSearch Optimized Accumulator (AKO) Strategy Protocol
@@ -140,7 +144,7 @@ PHASE 2: PROBABILITY MODELING AND CALIBRATION
    - A customized Poisson or Negative Binomial model based on adjusted Attack/Defense strengths (derived from xG/xGA and recent form).
    - An Elo-based probability calculation.
 2) FEATURE ADJUSTMENTS: Quantify the impact of key injuries/suspensions on team npxG/npxGA expectations. Adjust for home/away splits.
-3) SYNTHESIS & CALIBRATION: Combine the internal Ensemble Model outputs with the External Prediction data (Phase 1.6) using a weighted average approach. Calibrate against league averages (e.g., home-field advantage).
+3) SYNTHESIS & CALIBRATION: Combine the External Prediction data (Phase 1.6) with the internal Ensemble Model outputs using a weighted average approach (50% Internal, 50% External). Calibrate against league averages (e.g., home-field advantage).
 4) MODEL PROBABILITY: Generate the final 'Model Probability' (True Probability) for all outcomes in ALLOWED MARKETS.
 
 PHASE 3: SELECTION POOL GENERATION
@@ -171,6 +175,7 @@ This phase uses combinatorial optimization to maximize P(Win_Ticket).
    - Rank the remaining tickets. The primary sort key is P(Win_Ticket) (Descending). The secondary sort key is ROI_Ticket_Boosted (Descending).
    - Select the top {NUMBER_OF_TICKETS} results.
    - 1 match can be shared across different tickets, but each ticket must be unique in its full selection set.
+   - Each ticket must have at least 40% different selections compared to any other ticket.
 
 PHASE 5: OUTPUT GENERATION
 1) FORMATTING: Generate the output as specified below. Sort selections within each ticket by Confidence (descending).

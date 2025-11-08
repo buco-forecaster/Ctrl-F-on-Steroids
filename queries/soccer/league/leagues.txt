@@ -2,23 +2,27 @@
 COLLECTION: leagues
 DOMAIN: soccer
 VERSION: 2.1
-
+---
 @GLOBALS
-MATCH_DATE: 07 November 2025
+MATCH_DATE: 08 November 2025
 ODDS_RANGE: 1.30 to 7.00
-
+---
 @SEGMENT
 ANALYSIS_ID: soccer_la_liga
 LEAGUE: La Liga
+---
 @SEGMENT
 ANALYSIS_ID: soccer_serie_a
 LEAGUE: Serie A
+---
 @SEGMENT
 ANALYSIS_ID: soccer_bundesliga
 LEAGUE: Bundesliga
+---
 @SEGMENT
 ANALYSIS_ID: soccer_ligue_1
 LEAGUE: Ligue 1
+---
 
 @DEFAULT_FOLLOWUPS
 ODDS_SUMMARY_TABLE: |
@@ -59,6 +63,7 @@ RESULT: |
         "EV": "12.0%",
         "Value Detected?": "Yes"
     },
+---
 
 @CONTENT
 TITLE: DeepSearch Quantitative Value Bet Identification Protocol
@@ -105,7 +110,7 @@ PHASE 3: PROBABILITY MODELING AND CALIBRATION
    - An Elo-based probability calculation.
 2) Calibration: Calibrate the model outputs against the current LEAGUE season's averages (e.g., average goals per game, home-field advantage coefficient, draw frequency).
 3) Model Probability: Generate the 'Model Probability' (True Probability) for all outcomes in the 1X2 and relevant O/U markets.
-4) Synthesis & Calibration: Combine the internal Ensemble Model outputs with the External Prediction data using a weighted average approach.
+4) Synthesis & Calibration: Combine the External Prediction data (Phase 1.6) with the internal Ensemble Model outputs using a weighted average approach (50% Internal, 50% External). Calibrate against league averages (e.g., home-field advantage).
 
 PHASE 4: VALUE IDENTIFICATION AND PRIORITIZATION
 1) Fair Implied Probability: Calculate the bookmaker's implied probability (1/Odds). Remove the margin calculated in Phase 1 to determine the 'Fair Implied Probability' (probabilities rescaled to sum to 100%).

@@ -1,8 +1,9 @@
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-# Block headers and separator (can be imported from config if desired)
+# Block headers and separator
 BLOCK_SEPARATOR = '---'
+HDR_META = '@META'
 HDR_DEFAULTS = '@DEFAULT_FOLLOWUPS'
 HDR_GLOBALS = '@GLOBALS'
 HDR_SEGMENT = '@SEGMENT'
@@ -35,9 +36,8 @@ def _parse_key_value_block(lines: List[str]) -> Dict[str, str]:
         if value == "|":
             i += 1
             multin = []
-            # Collect all indented lines
             while i < len(lines):
-                if lines[i].startswith("  ") or (lines[i].startswith("\t")):
+                if lines[i].startswith("  ") or lines[i].startswith("\t"):
                     multin.append(lines[i][2:] if lines[i].startswith("  ") else lines[i].lstrip("\t"))
                     i += 1
                 elif lines[i].strip() == "":
@@ -51,6 +51,12 @@ def _parse_key_value_block(lines: List[str]) -> Dict[str, str]:
             i += 1
     return result
 
+def _parse_meta_block(block: str) -> Dict[str, str]:
+    lines = block.splitlines()
+    if not lines or not lines[0].strip().startswith(HDR_META):
+        return {}
+    return _parse_key_value_block(lines[1:])
+
 def _parse_defaults_block(block: str) -> Dict[str, str]:
     lines = block.splitlines()
     if not lines or not lines[0].strip().startswith(HDR_DEFAULTS):
@@ -63,7 +69,7 @@ def _parse_globals_block(block: str) -> List[str]:
         return []
     return [ln for ln in lines[1:] if ln.strip()]
 
-def _parse_segment_block(block: str, template: str, defaults: Dict[str, str], globals_preface: Optional[List[str]] = None) -> Dict[str, str]:
+def _parse_segment_block(block: str, template: str, defaults: Dict[str, str], globals_preface: Optional[List[str]] = None, meta: Optional[Dict[str, str]] = None) -> Dict[str, str]:
     lines = [ln for ln in block.splitlines()]
     if not lines or not lines[0].strip().startswith(HDR_SEGMENT):
         raise ValueError("Segment block must start with @SEGMENT")
@@ -95,7 +101,14 @@ def _parse_segment_block(block: str, template: str, defaults: Dict[str, str], gl
         local_followups = _parse_key_value_block(followup_lines)
 
     if not analysis_id:
-        raise ValueError("Segment is missing required ANALYSIS_ID: ... line")
+        # Try to find a line like "ANALYSIS_ID: ..." in preface
+        for line in preface:
+            kv = _parse_key_value_line(line)
+            if kv and kv[0].upper() == "ANALYSIS_ID":
+                analysis_id = kv[1]
+                break
+        if not analysis_id:
+            raise ValueError("Segment is missing required ANALYSIS_ID: ... line")
 
     merged_followups = dict(defaults) if defaults else {}
     if local_followups:
@@ -109,11 +122,16 @@ def _parse_segment_block(block: str, template: str, defaults: Dict[str, str], gl
     prompt_parts.append(template.strip())
     prompt = "\n\n".join(part for part in prompt_parts if part)
 
-    return {
+    segment = {
         "query": prompt,
         "followups": merged_followups,
         "analysis_id": analysis_id,
     }
+    if meta:
+        segment["meta"] = dict(meta)
+        if meta.get("COLLECTION"):
+            segment["collection"] = meta["COLLECTION"]
+    return segment
 
 def _parse_key_value_line(line: str) -> Optional[Tuple[str, str]]:
     if not line.strip() or ":" not in line:
@@ -127,29 +145,36 @@ def read_queries_file(path: str = "queries.txt"):
     if not blocks:
         raise ValueError("Empty queries file")
 
-    # CONTENT must be last block
-    content_block = blocks[-1]
-    content_lines = content_block.splitlines()
-    if not content_lines or not content_lines[0].strip().startswith(HDR_CONTENT):
-        raise ValueError("Last block must begin with @CONTENT")
-    template = "\n".join(content_lines[1:]).strip()
-    if not template:
-        raise ValueError("CONTENT block is empty")
-
-    idx = 0
+    content_idx = None
+    for i, b in enumerate(blocks):
+        if b.splitlines() and b.splitlines()[0].strip().startswith(HDR_CONTENT):
+            content_idx = i
+            break
+    if content_idx is None:
+        raise ValueError("No @CONTENT block found (should always be last block)")
+    template_block = blocks[content_idx]
+    template = "\n".join(template_block.splitlines()[1:]).strip()
+    block_ranges = list(enumerate(blocks[:content_idx]))
+    meta = None
     defaults = {}
     globals_preface = None
-
-    if blocks[0].strip().startswith(HDR_DEFAULTS):
-        defaults = _parse_defaults_block(blocks[0])
-        idx += 1
-
-    if idx < len(blocks)-1 and blocks[idx].strip().startswith(HDR_GLOBALS):
-        globals_preface = _parse_globals_block(blocks[idx])
-        idx += 1
-
     segments: List[Dict[str, str]] = []
-    for b in blocks[idx:-1]:
-        segments.append(_parse_segment_block(b, template, defaults, globals_preface))
+
+    for idx, b in block_ranges:
+        first = b.splitlines()[0].strip() if b.splitlines() else ""
+        if first.startswith(HDR_META):
+            if not meta:
+                meta = _parse_meta_block(b)
+        elif first.startswith(HDR_GLOBALS):
+            if globals_preface is None:
+                globals_preface = _parse_globals_block(b)
+        elif first.startswith(HDR_DEFAULTS):
+            if not defaults:
+                defaults = _parse_defaults_block(b)
+        elif first.startswith(HDR_SEGMENT):
+            segments.append(_parse_segment_block(b, template, defaults, globals_preface, meta))
+        else:
+            # ignore unknown block types for now
+            pass
 
     return (defaults if defaults else None), segments
