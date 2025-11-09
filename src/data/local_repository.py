@@ -32,3 +32,22 @@ class LocalRepository:
             "analysis_id": result.analysis_id,
         }
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    @staticmethod
+    def save_result_to(collection: str, result: AnalysisResult):
+        # Save file under a per-collection subdirectory of ANSWERS_DIR
+        subdir = ANSWERS_DIR / collection
+        subdir.mkdir(exist_ok=True, parents=True)
+        if not result.analysis_id or not result.analysis_id.strip():
+            raise ValueError("analysis_id is required for artifact storage and cannot be empty.")
+        base_name = result.analysis_id.strip().replace(" ", "_")
+        filename = f"{base_name}.json"
+        path = subdir / filename
+        payload = {
+            "timestamp": result.timestamp,
+            "query": result.query,
+            "pdf_path": result.pdf_path,
+            "followups": result.followups,
+            "analysis_id": result.analysis_id,
+        }
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -1,16 +1,47 @@
+@META
+COLLECTION: test
+DOMAIN: stocks
+VERSION: 2.1
+---
+@GLOBALS
+VALUATION_DATE: 08 November 2025
+CURRENCY: USD
+---
+@SEGMENT
+ANALYSIS_ID: stocks_google
+COMPANY: Alphabet Inc. (Google)
+TICKER: GOOGL
+---
+@SEGMENT
+ANALYSIS_ID: stocks_amazon
+COMPANY: Amazon.com, Inc.
+TICKER: AMZN
+---
+@SEGMENT
+ANALYSIS_ID: stocks_amazon
+COMPANY: Amazon.com, Inc.
+TICKER: AMZN
+---
+@SEGMENT
+ANALYSIS_ID: stocks_amazon
+COMPANY: Amazon.com, Inc.
+TICKER: AMZN
+---
+@SEGMENT
+ANALYSIS_ID: stocks_amazon
+COMPANY: Amazon.com, Inc.
+TICKER: AMZN
+---
+@SEGMENT
+ANALYSIS_ID: stocks_amazon
+COMPANY: Amazon.com, Inc.
+TICKER: AMZN
+---
 @DEFAULT_FOLLOWUPS
 COMPANY: |
     Return the exact legal company name for ticker {TICKER} as of {VALUATION_DATE}. Output only the name or Unknown.
 ANALYSIS_DATE: Return the analysis date as YYYYMMDD. Output only the 8 digit date.
 FAIR_VALUE_USD: Return the fair value per share in USD. Output only a number with optional decimals.
----
-@SEGMENT
-ANALYSIS_ID: Google
-COMPANY: Alphabet Inc. (Google)
----
-@SEGMENT
-ANALYSIS_ID: Amazon
-COMPANY: Amazon
 ---
 @CONTENT
 Analyse the company in detail.

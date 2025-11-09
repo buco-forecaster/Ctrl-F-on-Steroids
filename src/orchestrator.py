@@ -31,7 +31,12 @@ class Orchestrator:
                     followups = seg["followups"] or (defaults if defaults else {})
                     req = QueryRequest(query=seg["query"], followups=followups, analysis_id=seg["analysis_id"])
                     res = self.strategy.run(client, req)
-                    self.repository.save_result(res)
+                    collection = seg.get("collection")
+                    # Prefer collection-aware save when available
+                    if collection and hasattr(self.repository, "save_result_to"):
+                        self.repository.save_result_to(collection, res)
+                    else:
+                        self.repository.save_result(res)
                     results.append(res)
 
                 return results

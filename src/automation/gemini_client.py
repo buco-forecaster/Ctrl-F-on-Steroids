@@ -32,10 +32,11 @@ class GeminiClient:
 
         btn = self.page.get_by_role("button", name=L.RE_START_RESEARCH, exact=True)
         btn.wait_for(state="visible", timeout=DEFAULT_START_RESEARCH_TIMEOUT_MS)
-        time.sleep(1)
+        time.sleep(3)
         btn.scroll_into_view_if_needed(timeout=DEFAULT_TIMEOUT_MS)
         btn.click(timeout=DEFAULT_TIMEOUT_MS)
 
+        time.sleep(3)
         self.wait_for_answer(L.RE_COMPLETED, state="visible")
 
         return self.export_pdf(query=query, analysis_id=analysis_id)
@@ -65,7 +66,7 @@ class GeminiClient:
     def wait_for_answer(self, text, state) -> None:
         just_sec = self.page.get_by_text(text).last
         just_sec.wait_for(state=state, timeout=DEFAULT_DEEP_RESEARCH_TIMEOUT_MS)
-        time.sleep(3)
+        time.sleep(5)
 
     def ask_and_capture(self, q: str) -> str:
         box = self.page.get_by_role("textbox")
@@ -75,7 +76,7 @@ class GeminiClient:
         self.page.keyboard.press("Enter")
         self.wait_for_answer(L.RE_FOLLOWUP_WAIT, state="visible")
         self.wait_for_answer(L.RE_FOLLOWUP_WAIT, state="hidden")
-        time.sleep(5)
+        time.sleep(8)
 
         return self.extract_last_assistant_answer()
     def export_pdf(self, query: str, analysis_id: str) -> str:

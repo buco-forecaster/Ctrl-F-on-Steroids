@@ -4,8 +4,8 @@ DOMAIN: soccer
 VERSION: 2.1
 ---
 @GLOBALS
-MATCH_DATE: 08 November 2025
-ODDS_RANGE: 1.30 to 7.00
+MATCH_DATE: 09 November 2025
+ODDS_RANGE: 1.30 to 2.5
 ---
 @SEGMENT
 ANALYSIS_ID: soccer_la_liga
@@ -78,8 +78,8 @@ CORE CONSTRAINTS:
   - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
   - DON'T fabricate (simulate) odds data.
 - ODDS RANGE: Decimal odds strictly between {ODDS_RANGE}.
-- ALLOWED MARKETS: 1X2 (Full Time Result) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5), Both Teams To Score (BTTS).
-- FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps.
+- ALLOWED MARKETS: 1X2 (Full Time Result), 1X and X2 (Double Chance) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5, 3.5).
+- FORBIDDEN MARKETS: Both Teams To Score (BTTS), Corners, Cards, Asian Handicaps.
 - CITATION MANDATE: All critical data points (stats, odds, key news) MUST be cited with a direct URL.
 
 EXECUTION PROTOCOL:

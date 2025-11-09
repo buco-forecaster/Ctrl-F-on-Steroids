@@ -34,19 +34,37 @@ class BaseMongoRepository(Repository):
         )
         self._db = self._client[db_name]
         self._col: Collection = self._db[collection_name]
-        self._ensure_indexes()
+        self._indexed = set()
+        self._ensure_indexes(self._col)
 
-    def _ensure_indexes(self) -> None:
-        # Ensure unique index on analysis_id for upsert/replace semantics
-        self._col.create_index([("analysis_id", ASCENDING)], unique=True, name="ix_analysis_id_unique")
-        self._col.create_index([("created_at", DESCENDING)], name="ix_created_at")
+    def _ensure_indexes(self, col: Collection) -> None:
+        if col.name in self._indexed:
+            return
+        col.create_index([("analysis_id", ASCENDING)], unique=True, name="ix_analysis_id_unique")
+        col.create_index([("created_at", DESCENDING)], name="ix_created_at")
+        self._indexed.add(col.name)
+
+    def _to_col(self, collection_name: str = None) -> Collection:
+        if not collection_name:
+            return self._col
+        col = self._db[collection_name]
+        self._ensure_indexes(col)
+        return col
 
     def save_result(self, result: AnalysisResult) -> str:
         if not result.analysis_id or not result.analysis_id.strip():
             raise ValueError("analysis_id is required")
         doc = _to_document(result)
-        # Use analysis_id as unique key for upsert (replace/update)
-        res = self._col.replace_one({"analysis_id": result.analysis_id}, doc, upsert=True)
+        col = self._to_col()
+        res = col.replace_one({"analysis_id": result.analysis_id}, doc, upsert=True)
+        return str(res.upserted_id) if res.upserted_id else result.analysis_id
+
+    def save_result_to(self, collection: str, result: AnalysisResult) -> str:
+        if not result.analysis_id or not result.analysis_id.strip():
+            raise ValueError("analysis_id is required")
+        doc = _to_document(result)
+        col = self._to_col(collection)
+        res = col.replace_one({"analysis_id": result.analysis_id}, doc, upsert=True)
         return str(res.upserted_id) if res.upserted_id else result.analysis_id
 
 class StockMongoRepository(BaseMongoRepository):

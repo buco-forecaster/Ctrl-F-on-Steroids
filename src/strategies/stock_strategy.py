@@ -9,28 +9,31 @@ from src.data.mongo_repository import StockMongoRepository
 class StockStrategy:
     def run(self, client: GeminiClient, request: QueryRequest) -> AnalysisResult:
         max_attempts = 3
+
         attempts = 0
-        try:
-            while attempts < max_attempts:
-                attempts += 1
+        while attempts < max_attempts:
+            try:
                 pdf_path = client.execute_deep_research(request.query, analysis_id=request.analysis_id)
                 break
-        except Exception as e:
-            print(f"Error during deep research execution: {e}")
-            client.page.reload(timeout=DEFAULT_TIMEOUT_MS)
+            except Exception as e:
+                print(f"Error during deep research execution: {e}")
+                client.new_chat()
+
+            attempts += 1
 
         if attempts == max_attempts:
             raise RuntimeError("Failed to execute deep research after multiple attempts.")
 
         attempts = 0
-        try:
-            while attempts < max_attempts:
-                attempts += 1
+        while attempts < max_attempts:
+            try:
                 followups = client.ask_followups(request.followups)
                 break
-        except Exception as e:
-            print(f"Error during deep research execution: {e}")
-            client.page.reload(timeout=DEFAULT_TIMEOUT_MS)
+            except Exception as e:
+                print(f"Error during deep research execution: {e}")
+                client.page.reload(timeout=DEFAULT_TIMEOUT_MS)
+
+            attempts += 1
 
         if attempts == max_attempts:
             raise RuntimeError("Failed to ask follow-up questions after multiple attempts.")

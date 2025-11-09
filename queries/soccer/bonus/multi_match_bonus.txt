@@ -5,29 +5,27 @@ VERSION: 2.1
 ---
 
 @GLOBALS
-MATCH_DATE: 03 November 2025
+MATCH_DATE: 09 November 2025
 ---
 
 @SEGMENT
-- LEAGUES: La Liga, Bundesliga
-- NUMBER_OF_TICKETS: 3
-- ODDS_RANGE_PER_FIXTURE: 1.30 - 1.80
-- MAX_TICKET_ODD: 13.00
-- BONUS_STRUCTURE:
+ANALYSIS_ID: ako_5_matches_30_percent_bonus_04
+LEAGUES: Premier League, Serie A, La Liga
+NUMBER_OF_TICKETS: 2
+ODDS_RANGE_PER_FIXTURE: 1.30 - 2.20
+MAX_TICKET_ODD: 13.00
+BONUS_STRUCTURE:
     Event: Fortuna Generous Weekends Bonus: 30% Odds Boost
     Conditions:
-      - Bet type must be an accumulator (AKO).
-      - The accumulator bet must contain at least 5 selections.
-      - Each of these 5 selections must have minimum odds of 1.3.
+        - Bet type must be an accumulator (AKO).
+        - The accumulator bet must contain at least 5 selections.
+        - Each of these 5 selections must have minimum odds of 1.3.
     Indicators:
-      - If the bet qualifies, the ticket will display "EXTRA 30 %".
-      - If the bet qualifies, the potential winnings will be increased by 30%.
+        - If the bet qualifies, the ticket will display "EXTRA 30 %".
+        - If the bet qualifies, the potential winnings will be increased by 30%.
 ---
 
 @DEFAULT_FOLLOWUPS
-ODDS_SUMMARY_TABLE: |
-    Return exactly one plain Markdown table. Do not use a code block. Show only the requested summary (tickets) tables.
-    No text before or after. No extra blocks. No explanations or comments. Do not include backticks. Output only the table so it can be parsed and stored as a Python string.
 RESULT: |
     Prompt: Your response must be only a single fenced code block containing a valid JSON object.
 
@@ -125,8 +123,8 @@ ROLE: Act as an expert Quantitative Sports Analyst and Data Scientist. Your obje
     - Tertiary: Niké (nike.sk) or flashscore.com which mirror ifortuna odds.
     - Fallback: A reputable Slovak bookmaker (e.g. Tipsport SK). Clearly label the source as Fallback: [Bookmaker Name].
     - DON'T fabricate (simulate) odds data.
-- ALLOWED MARKETS: 1X2 (Full Time Result), Over/Under (Total Goals - all lines, e.g., 1.5, 2.5), Both Teams To Score (BTTS).
-- FORBIDDEN MARKETS: Corners, Cards, Asian Handicaps, Draw No Bet, Player Props.
+- ALLOWED MARKETS: 1X2 (Full Time Result), 1X and X2 (Double Chance) and Over/Under (Total Goals - all lines, e.g., 1.5, 2.5).
+- FORBIDDEN MARKETS: Both Teams To Score (BTTS), Corners, Cards, Asian Handicaps, Draw No Bet, Player Props.
 
 PHASE 1: DATA SYNTHESIS AND ACQUISITION
 1) SCOPE: Identify all matches within the defined LEAGUES playing on MATCH_DATE. List kickoff times in UTC.
@@ -176,6 +174,7 @@ This phase uses combinatorial optimization to maximize P(Win_Ticket).
    - Select the top {NUMBER_OF_TICKETS} results.
    - 1 match can be shared across different tickets, but each ticket must be unique in its full selection set.
    - Each ticket must have at least 40% different selections compared to any other ticket.
+   - Use each match only once in a ticket and choose one market for that match (e.g., if Match A is chosen for Ticket 1 as Home Win, it cannot be chosen again in Ticket 1 as Over 2.5).
 
 PHASE 5: OUTPUT GENERATION
 1) FORMATTING: Generate the output as specified below. Sort selections within each ticket by Confidence (descending).
