@@ -1,5 +1,5 @@
 @META
-COLLECTION: leagues
+COLLECTION: league
 DOMAIN: soccer
 VERSION: 2.1
 ---
@@ -25,13 +25,6 @@ LEAGUE: Ligue 1
 ---
 
 @DEFAULT_FOLLOWUPS
-ODDS_SUMMARY_TABLE: |
-  Return exactly one plain Markdown table.
-  Do not use a code block.
-  Show only the requested summary table.
-  No text before or after. No extra blocks.
-  No explanations or comments. Do not include backticks.
-  Output only the table so it can be parsed and stored as a Python string.
 RESULT: |
     Prompt: Your response must be only a single fenced code block containing a JSON object.
     Strict Output Requirements:

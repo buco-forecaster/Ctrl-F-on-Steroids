@@ -13,7 +13,21 @@ class StockStrategy:
         attempts = 0
         while attempts < max_attempts:
             try:
-                pdf_path = client.execute_deep_research(request.query, analysis_id=request.analysis_id)
+                client.execute_deep_research(request.query, analysis_id=request.analysis_id)
+                break
+            except Exception as e:
+                print(f"Error during deep research execution: {e}")
+                client.new_chat()
+
+            attempts += 1
+
+        if attempts == max_attempts:
+            raise RuntimeError("Failed to execute deep research after multiple attempts.")
+
+        attempts = 0
+        while attempts < max_attempts:
+            try:
+                pdf_path = client.export_pdf(request.query, analysis_id=request.analysis_id)
                 break
             except Exception as e:
                 print(f"Error during deep research execution: {e}")

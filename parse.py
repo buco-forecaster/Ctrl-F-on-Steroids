@@ -1,7 +1,6 @@
 import argparse
 from src.orchestrator import Orchestrator
 from src.strategies.stock_strategy import StockStrategy
-from src.data.local_repository import LocalRepository
 from src.data.mongo_repository import StockMongoRepository
 
 def main():
@@ -11,7 +10,6 @@ def main():
     args = parser.parse_args()
 
     strategy = StockStrategy()
-    #repo = LocalRepository()
     repo = StockMongoRepository()
     orch = Orchestrator(strategy, repo)
     orch.run_batch(args.queries_file)

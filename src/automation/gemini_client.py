@@ -39,9 +39,40 @@ class GeminiClient:
         time.sleep(3)
         self.wait_for_answer(L.RE_COMPLETED, state="visible")
 
-        return self.export_pdf(query=query, analysis_id=analysis_id)
-        self.page.goto("https://gemini.google.com/app/01270b5a267d9b5a")
-        time.sleep(3)
+        #self.page.goto("https://gemini.google.com/app/01270b5a267d9b5a")
+        #time.sleep(3)
+
+    def export_pdf(self, query: str, analysis_id: str) -> str:
+        if not analysis_id or not analysis_id.strip():
+            raise ValueError("analysis_id is required for PDF export and cannot be empty.")
+
+        share_btn = self.page.get_by_role("button").filter(has_text=L.RE_SHARE_EXPORT).last
+        share_btn.click(timeout=DEFAULT_TIMEOUT_MS)
+
+        with self.page.expect_popup(timeout=DEFAULT_TIMEOUT_MS) as popup_info:
+            menuitem = self.page.get_by_role("menuitem", name=L.RE_EXPORT_TO_DOCS)
+            menuitem.click(timeout=DEFAULT_TIMEOUT_MS)
+        time.sleep(10)
+
+        doc_page = popup_info.value
+        file_menu = doc_page.get_by_role("menuitem", name="File")
+        file_menu.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
+        file_menu.click(timeout=DEFAULT_TIMEOUT_MS)
+        time.sleep(1.5)
+
+        download_menu = doc_page.get_by_role("menuitem", name="Download")
+        download_menu.hover(timeout=DEFAULT_TIMEOUT_MS)
+        time.sleep(1.5)
+
+        pdf_item = doc_page.get_by_role("menuitem", name="PDF Document")
+        with doc_page.expect_download(timeout=DEFAULT_TIMEOUT_MS) as dl_info:
+            pdf_item.click(timeout=DEFAULT_TIMEOUT_MS)
+
+        download = dl_info.value
+        out_path = self.save_pdf(download, analysis_id=analysis_id)
+        doc_page.close()
+
+        return out_path
 
     def ask_followups(self, followups: Dict[str, str]) -> Dict[str, str]:
         answers = {}
@@ -79,40 +110,9 @@ class GeminiClient:
         time.sleep(8)
 
         return self.extract_last_assistant_answer()
-    def export_pdf(self, query: str, analysis_id: str) -> str:
-        if not analysis_id or not analysis_id.strip():
-            raise ValueError("analysis_id is required for PDF export and cannot be empty.")
-
-        share_btn = self.page.get_by_role("button").filter(has_text=L.RE_SHARE_EXPORT).last
-        share_btn.click(timeout=DEFAULT_TIMEOUT_MS)
-
-        with self.page.expect_popup(timeout=DEFAULT_TIMEOUT_MS) as popup_info:
-            menuitem = self.page.get_by_role("menuitem", name=L.RE_EXPORT_TO_DOCS)
-            menuitem.click(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(10)
-
-        doc_page = popup_info.value
-        file_menu = doc_page.get_by_role("menuitem", name="File")
-        file_menu.wait_for(state="visible", timeout=DEFAULT_TIMEOUT_MS)
-        file_menu.click(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(1.5)
-
-        download_menu = doc_page.get_by_role("menuitem", name="Download")
-        download_menu.hover(timeout=DEFAULT_TIMEOUT_MS)
-        time.sleep(1.5)
-
-        pdf_item = doc_page.get_by_role("menuitem", name="PDF Document")
-        with doc_page.expect_download(timeout=DEFAULT_TIMEOUT_MS) as dl_info:
-            pdf_item.click(timeout=DEFAULT_TIMEOUT_MS)
-
-        download = dl_info.value
-        out_path = self.save_as_pdf(query, download, analysis_id=analysis_id)
-        doc_page.close()
-
-        return out_path
 
     @staticmethod
-    def save_as_pdf(query: str, downloaded_file, analysis_id: str) -> str:
+    def save_pdf(downloaded_file, analysis_id: str) -> str:
         if not analysis_id or not analysis_id.strip():
             raise ValueError("analysis_id is required for filename and cannot be empty.")
 

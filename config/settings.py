@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest.mock import DEFAULT
 
 # Core configuration
 GEMINI_URL = "https://gemini.google.com/app"
@@ -8,7 +7,7 @@ AUTH_STATE_PATH = Path(".auth/storage_state_chrome.json")
 CHROME_PROFILE_DIR = Path.home() / "chrome-automation-profile"
 
 # Browser environment
-VIEWPORT = {"width": 2120, "height": 1080}
+VIEWPORT = {"width": 1900, "height": 1280}
 LOCALE = "en-US"
 TIMEZONE_ID = "Europe/Prague"
 USER_AGENT = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "

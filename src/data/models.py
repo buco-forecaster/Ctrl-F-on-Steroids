@@ -14,3 +14,4 @@ class AnalysisResult:
     followups: Dict[str, str]
     pdf_path: str  # Now required
     analysis_id: str  # Now required
+    result: dict
